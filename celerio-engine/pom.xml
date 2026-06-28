@@ -28,6 +28,12 @@
     <name>celerio-engine</name>
     <description>Celerio Core Generation Engine</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
 
     <dependencies>
         <dependency>
@@ -330,6 +336,7 @@
                     </items>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -344,6 +351,8 @@
                         <configuration>
                             <tasks>
                                 <java fork="true" failonerror="true" classname="org.jibx.binding.generator.BindGen">
+                                    <sysproperty key="jdk.util.zip.disableZip64ExtraFieldValidation" value="true"/>
+
                                     <classpath>
                                         <path refid="maven.dependency.classpath" />
                                         <path refid="maven.compile.classpath" />
@@ -386,7 +395,6 @@ relase.by=${user.name}]]></echo>
                         </exclusions>
                     </dependency>
                     <dependency>
-                        <!-- TODO: workaround while waiting for BCEL 6.0; -->
                         <groupId>com.google.code.findbugs</groupId>
                         <artifactId>bcel-findbugs</artifactId>
                         <version>6.0</version>
@@ -501,5 +509,6 @@ relase.by=${user.name}]]></echo>
                 </configuration>
             </plugin>
         </plugins>
+
     </build>
 </project>
