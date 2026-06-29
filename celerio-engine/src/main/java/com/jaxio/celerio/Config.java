@@ -53,11 +53,15 @@ public class Config {
         this.metadata = metadata;
         this.metadata.setDatabaseInfo(metadata.getDatabaseInfo());
         this.metadata.setJdbcConnectivity(metadata.getJdbcConnectivity());
+        // Rebuild table lookup indexes — JAXB sets the 'tables' field directly,
+        // bypassing setTables(), so tablesByName/tablesBySchemaAndName are empty after load.
+        this.metadata.setTables(metadata.getTables());
         this.originalMetadata = deepCopy(metadata);
     }
 
     private Metadata deepCopy(Metadata metadata) {
         XStream XSTREAM = new XStream();
+        XSTREAM.allowTypesByWildcard(new String[] { "com.jaxio.celerio.**", "java.util.**", "java.lang.**" });
         return (Metadata) XSTREAM.fromXML(XSTREAM.toXML(metadata));
     }
 

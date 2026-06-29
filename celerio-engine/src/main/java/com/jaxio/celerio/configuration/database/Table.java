@@ -414,4 +414,10 @@ public class Table {
     public String asKeyForMap() {
         return keyForMap(schemaName, name);
     }
+
+    void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+        setColumns(columns);
+        setIndexes(indexes);
+        setImportedKeys(importedKeys);
+    }
 }

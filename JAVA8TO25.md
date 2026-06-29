@@ -189,3 +189,104 @@ Les dépendances Eclipse OSGi (`org.eclipse.equinox`, `org.eclipse.tycho`, `org.
 ```
 Tests run: 94, Failures: 0, Errors: 0, Skipped: 3
 ```
+
+---
+
+## Bugs JiBX→JAXB supplémentaires — découverts via test end-to-end (pack-angular)
+
+Les bugs suivants ont été découverts lors du test de régénération complet avec le pack `pack-angular`. Ils résultent tous du même problème racine : **JAXB (avec `@XmlAccessorType(FIELD)`) affecte directement les champs sans passer par les setters**, contrairement à JiBX qui appelait les setters. Les maps dérivées (annotées `@XmlTransient`) ne sont donc jamais reconstruites après désérialisation XML.
+
+### Bug 1 — `Config.deepCopy()` : `ForbiddenClassException` XStream
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/Config.java`
+
+**Symptôme** : `com.thoughtworks.xstream.security.ForbiddenClassException: com.jaxio.celerio.configuration.database.Metadata`
+
+**Cause** : `new XStream()` sans allowlist de types.
+
+**Fix** :
+```java
+private Metadata deepCopy(Metadata metadata) {
+    XStream XSTREAM = new XStream();
+    XSTREAM.allowTypesByWildcard(new String[] { "com.jaxio.celerio.**", "java.util.**", "java.lang.**" });
+    return (Metadata) XSTREAM.fromXML(XSTREAM.toXML(metadata));
+}
+```
+
+Et `setMetadata()` appelle explicitement `this.metadata.setTables(metadata.getTables())` pour reconstruire les index.
+
+### Bug 2 — `Metadata.tablesByName` vide après JAXB
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/configuration/database/Metadata.java`
+
+**Symptôme** : `The table named USER could not be found. Schema: null`
+
+**Cause** : JAXB ne passe pas par `setTables()` — la map `tablesByName` (`@XmlTransient`) reste vide.
+
+**Fix** : Ajout du callback `afterUnmarshal` + `setTables()` reconstruisit également les maps de chaque table :
+```java
+void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+    setTables(tables);
+}
+```
+Dans `setTables()`, appel de `table.setColumns()`, `table.setIndexes()`, `table.setImportedKeys()` pour chaque table.
+
+### Bug 3 — `Table.columnsByName` vide après JAXB
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/configuration/database/Table.java`
+
+**Symptôme** : colonnes non trouvées dans les tables, erreurs lors du mapping entité.
+
+**Fix** : Ajout du callback `afterUnmarshal` :
+```java
+void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+    setColumns(columns);
+    setIndexes(indexes);
+    setImportedKeys(importedKeys);
+}
+```
+
+### Bug 4 — `EntityConfig.columnConfigByColumnName` vide après JAXB
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/configuration/entity/EntityConfig.java`
+
+**Symptôme** : `civility column unknown` — colonnes de l'entityConfig non trouvées lors de la génération.
+
+**Fix** : Ajout du callback `afterUnmarshal` :
+```java
+void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+    setColumnConfigs(columnConfigs);
+}
+```
+
+### Bug 5 — `Celerio.sharedEnumConfigs` : mismatch `@XmlElement(name=)`
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/configuration/Celerio.java`
+
+**Symptôme** : `Shared enum Civility does not exist` — les enums partagés ne sont pas chargés.
+
+**Cause** : L'annotation était `@XmlElement(name = "enumConfig")` mais le XML utilise `<sharedEnumConfig>`.
+
+**Fix** :
+```java
+@XmlElement(name = "sharedEnumConfig")  // était "enumConfig"
+private List<EnumConfig> sharedEnumConfigs = newArrayList();
+```
+
+### Bug 6 — `ValidationAttribute` : imports `javax.*` / `org.hibernate.validator.constraints.*`
+
+**Fichier** : `celerio-engine/src/main/java/com/jaxio/celerio/model/support/validation/ValidationAttribute.java`
+
+**Symptôme** : Erreur de compilation dans les sources générées — `NotEmpty`, `Email`, `NotNull`, `Size`, `Digits` non trouvés.
+
+**Cause** : Le moteur générais `org.hibernate.validator.constraints.NotEmpty/Email` (supprimés dans Hibernate Validator 8) et `javax.validation.constraints.*` (remplacé par `jakarta.*`).
+
+**Fix** : Remplacer dans `ValidationAttribute.java` :
+
+| Avant | Après |
+|---|---|
+| `org.hibernate.validator.constraints.NotEmpty` | `jakarta.validation.constraints.NotEmpty` |
+| `org.hibernate.validator.constraints.Email` | `jakarta.validation.constraints.Email` |
+| `javax.validation.constraints.NotNull` | `jakarta.validation.constraints.NotNull` |
+| `javax.validation.constraints.Size` | `jakarta.validation.constraints.Size` |
+| `javax.validation.constraints.Digits` | `jakarta.validation.constraints.Digits` |

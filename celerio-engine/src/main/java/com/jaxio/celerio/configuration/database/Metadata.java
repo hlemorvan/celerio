@@ -53,8 +53,14 @@ public class Metadata {
     public void setTables(List<Table> tables) {
         this.tables = nonNull(tables);
         tablesByName = newHashMap();
+        tablesBySchemaAndName = newHashMap();
+        tablesInMultipleSchema = new HashSet<String>();
 
         for (Table table : this.tables) {
+            // Rebuild derived maps that JAXB does not populate (they are @XmlTransient).
+            table.setColumns(table.getColumns());
+            table.setIndexes(table.getIndexes());
+            table.setImportedKeys(table.getImportedKeys());
             putTable(table);
         }
     }
@@ -120,5 +126,9 @@ public class Metadata {
                 table.cleanup();
             }
         }
+    }
+
+    void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+        setTables(tables);
     }
 }

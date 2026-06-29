@@ -104,7 +104,7 @@ public class ValidationAttribute extends AbstractAttributeSpi {
             return "";
         }
         if (!(attribute.isString() && !attribute.isEnum())) {
-            addImport("javax.validation.constraints.NotNull");
+            addImport("jakarta.validation.constraints.NotNull");
             return appendComment("@NotNull");
         }
         return "";
@@ -115,7 +115,7 @@ public class ValidationAttribute extends AbstractAttributeSpi {
             return "";
         }
         if (attribute.isString() && !attribute.isEnum()) {
-            addImport("org.hibernate.validator.constraints.NotEmpty");
+            addImport("jakarta.validation.constraints.NotEmpty");
             return appendComment("@NotEmpty");
         }
         return "";
@@ -139,7 +139,7 @@ public class ValidationAttribute extends AbstractAttributeSpi {
         if (skip() || attribute.isFixedSize() || attribute.isFileSize() || !attribute.isString() || attribute.isEnum()) {
             return "";
         }
-        addImport("javax.validation.constraints.Size");
+        addImport("jakarta.validation.constraints.Size");
 
         AttributeBuilder ab = new AttributeBuilder(isCommentMode());
         if (attribute.getColumnConfig().getMin() != null) {
@@ -153,7 +153,7 @@ public class ValidationAttribute extends AbstractAttributeSpi {
         if (skip() || !attribute.isEmail() || attribute.isEnum()) {
             return "";
         }
-        addImport("org.hibernate.validator.constraints.Email");
+        addImport("jakarta.validation.constraints.Email");
         return appendComment("@Email");
     }
 
@@ -162,7 +162,7 @@ public class ValidationAttribute extends AbstractAttributeSpi {
             return "";
         }
 
-        addImport("javax.validation.constraints.Digits");
+        addImport("jakarta.validation.constraints.Digits");
         AttributeBuilder ab = new AttributeBuilder(isCommentMode());
         ab.addInt("integer", attribute.getColumnConfig().getSize() - attribute.getColumnConfig().getDecimalDigits());
         ab.addInt("fraction", attribute.getColumnConfig().getDecimalDigits());

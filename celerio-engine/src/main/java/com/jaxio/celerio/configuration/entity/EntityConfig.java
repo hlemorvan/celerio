@@ -433,4 +433,8 @@ public class EntityConfig implements CacheConfigGetter {
     public String toString() {
         return "[entityName=" + getEntityName() + ", tableName=" + getTableName() + "]";
     }
+
+    void afterUnmarshal(jakarta.xml.bind.Unmarshaller u, Object parent) {
+        setColumnConfigs(columnConfigs);
+    }
 }

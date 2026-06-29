@@ -37,7 +37,7 @@ public class Celerio {
     @XmlElement(name = "entityConfig")
     private List<EntityConfig> entityConfigs = newArrayList();
     @XmlElementWrapper(name = "sharedEnumConfigs")
-    @XmlElement(name = "enumConfig")
+    @XmlElement(name = "sharedEnumConfig")
     private List<EnumConfig> sharedEnumConfigs = newArrayList();
 
     /*
