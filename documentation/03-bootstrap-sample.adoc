@@ -1,0 +1,101 @@
+[[bootstrap-sample]]
+= 3. Démarrer un projet exemple avec Celerio
+
+== Exécuter le wizard de bootstrap
+
+*Prérequis :*
+
+* link:https://adoptium.net/[JDK 25+]
+* link:https://maven.apache.org/download.cgi[Maven 3.9+]
+
+Invoquez le goal `bootstrap` du `bootstrap-maven-plugin`. Depuis une ligne de commande, exécutez :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+mvn com.jaxio.celerio:bootstrap-maven-plugin:bootstrap
+----
+
+NOTE: Cette commande peut prendre un moment la première fois car Maven doit télécharger toutes les dépendances nécessaires.
+
+Suivez le wizard. Une fois terminé, il affiche des informations dans la console. Ne lancez aucune commande pour le moment.
+
+----
+FINAL STEPS:
+
+1/ Optional: you can edit the generated pom.xml file to use your own database
+
+2/ Execute the following commands:
+
+cd myapp
+mvn -Pdb,metadata,gen spring-boot:run
+
+3/ Then open http://localhost:8081/
+----
+
+== Découvrez les fichiers générés par le wizard
+
+Avant de lancer les commandes, prenez le temps de découvrir les fichiers créés par le wizard. En général ils incluent :
+
+* `pom.xml` : un fichier POM Maven complet.
+* `quickstart-conf/01-create.sql` : un script SQL pour créer et initialiser une base H2 locale. C'est la base exemple que Celerio va inverser.
+* `quickstart-conf/celerio-maven-plugin.xml` : fichier de configuration Celerio.
+* `quickstart-conf/celerio-template-packs.xml` : autre fichier de configuration Celerio.
+
+Ces fichiers sont les « graines » pour générer le projet.
+
+== Inverser, générer et lancer le projet exemple
+
+Vous êtes maintenant prêt à :
+
+* créer la base de données exemple à partir du script SQL fourni,
+* inverser le schéma de cette base et générer le code source correspondant,
+* compiler le projet généré,
+* lancer l'application web résultante.
+
+Pour ce faire, depuis la même console, exécutez la commande Maven :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+cd myapp
+mvn -Pdb,metadata,gen generate-sources
+mvn spring-boot:run
+----
+
+NOTE: Cette commande peut prendre un moment la première fois.
+
+Ouvrez ensuite link:http://localhost:8081/[http://localhost:8081/] dans votre navigateur. Pouvez-vous vous connecter avec `admin`/`admin` ? Si oui, félicitations, tout s'est bien passé !
+
+== Familiarisez-vous avec les profils Maven
+
+L'option `-P` signifie _profile_. Dans la commande ci-dessus, nous activons :
+
+* `db` — crée une nouvelle base de données,
+* `metadata` — inverse le schéma de la base,
+* `gen` — génère le code source correspondant.
+
+Ces profils sont déclarés dans le fichier `pom.xml` principal. La commande `spring-boot:run` démarre le serveur embarqué (port 8081 par défaut dans le pack Angular).
+
+NOTE: Dans l'ancienne documentation, le serveur embarqué était Jetty (`jetty:run`). Depuis Spring Boot 4, on utilise directement `spring-boot:run` qui démarre Tomcat embarqué.
+
+== Lancer le frontend Angular
+
+Le pack Angular génère une application frontend séparée. Pour la développer :
+
+[source,bash]
+----
+cd src/main/webapp
+npm install
+npm start
+----
+
+Le frontend est accessible sur link:http://localhost:4200/[http://localhost:4200/] et proxifie les appels API vers le backend Spring Boot (port 8081).
+
+== API Swagger
+
+L'API REST générée est documentée via Swagger UI accessible à :
+
+* link:http://localhost:8081/swagger-ui/index.html[http://localhost:8081/swagger-ui/index.html]
+
+Connectez-vous avec `admin`/`admin` pour accéder à la documentation complète.

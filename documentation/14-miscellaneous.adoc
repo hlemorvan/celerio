@@ -1,0 +1,114 @@
+[[miscellaneous]]
+= 14. Divers
+
+* <<install-oracle-jdbc>>
+* <<install-db2-jdbc>>
+
+[[install-oracle-jdbc]]
+== Installer le driver Oracle JDBC dans votre dépôt Maven local
+
+Si vous utilisez Oracle, vous devez d'abord installer votre driver JDBC Oracle dans votre dépôt Maven local.
+
+=== Étape 1 — Télécharger le driver JDBC Oracle
+
+Téléchargez manuellement le driver JDBC Oracle depuis link:http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html[le site Oracle].
+
+=== Étape 2 — Installer le driver dans votre dépôt Maven local
+
+En supposant que votre driver JDBC Oracle est dans un fichier `ojdbc11.jar` (Oracle 23c+) :
+
+[source,bash]
+----
+mvn install:install-file \
+  -Dfile=ojdbc11.jar \
+  -DgroupId=com.oracle.database.jdbc \
+  -DartifactId=ojdbc11 \
+  -Dversion=23.4.0.24.05 \
+  -Dpackaging=jar \
+  -DgeneratePom=true
+----
+
+=== Étape 3 — Ajouter la dépendance dans pom.xml
+
+[source,xml]
+----
+<dependency>
+    <groupId>com.oracle.database.jdbc</groupId>
+    <artifactId>ojdbc11</artifactId>
+    <version>23.4.0.24.05</version>
+</dependency>
+----
+
+Configurez ensuite les propriétés JDBC dans `pom.xml` :
+
+[source,xml]
+----
+<jdbc.groupId>com.oracle.database.jdbc</jdbc.groupId>
+<jdbc.artifactId>ojdbc11</jdbc.artifactId>
+<jdbc.version>23.4.0.24.05</jdbc.version>
+
+<jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
+<jdbc.url>jdbc:oracle:thin:@//localhost:1521/orclpdb1</jdbc.url>
+<jdbc.user>myuser</jdbc.user>
+<jdbc.password>mypassword</jdbc.password>
+<jdbc.schema>MYSCHEMA</jdbc.schema>
+<hibernate.dialect>org.hibernate.dialect.OracleDialect</hibernate.dialect>
+<sql-maven-plugin.delimiter>/</sql-maven-plugin.delimiter>
+----
+
+NOTE: Pour Oracle, le délimiteur SQL doit souvent être `/` plutôt que `;`.
+
+Vous êtes maintenant prêt à inverser votre base de données Oracle avec Celerio et générer un projet Java/JPA/Hibernate/Spring complet !
+
+[[install-db2-jdbc]]
+== Générer un projet depuis un schéma IBM DB2
+
+Inverser une base de données DB2 avec Celerio requiert quelques étapes supplémentaires.
+
+=== Installer le driver JDBC
+
+Le driver JDBC DB2 n'est pas disponible sur Maven Central. Vous devez le télécharger depuis link:http://www-01.ibm.com/software/data/db2/express/download.html[IBM site] et l'installer manuellement.
+
+En plus du driver, vous devez aussi installer une licence pour que le driver fonctionne normalement.
+
+En supposant que vous avez les deux jars suivants :
+
+* `db2jcc4.jar`
+* `db2jcc_license_cu.jar`
+
+Avec la version driver `9.7.0.4`, ouvrez une console dans le dossier contenant ces 2 fichiers jar et lancez :
+
+[source,bash]
+----
+mvn install:install-file \
+  -Dfile=db2jcc4.jar \
+  -DgroupId=com.ibm.db2 \
+  -DartifactId=db2jcc4 \
+  -Dversion=9.7.0.4 \
+  -Dpackaging=jar \
+  -DgeneratePom=true
+
+mvn install:install-file \
+  -Dfile=db2jcc_license_cu.jar \
+  -DgroupId=com.ibm.db2 \
+  -DartifactId=db2jcc_license_cu \
+  -Dversion=9.7.0.4 \
+  -Dpackaging=jar \
+  -DgeneratePom=true
+----
+
+Ajoutez ensuite les dépendances dans votre `pom.xml` :
+
+[source,xml]
+----
+<dependency>
+    <groupId>com.ibm.db2</groupId>
+    <artifactId>db2jcc4</artifactId>
+    <version>9.7.0.4</version>
+</dependency>
+<dependency>
+    <groupId>com.ibm.db2</groupId>
+    <artifactId>db2jcc_license_cu</artifactId>
+    <version>9.7.0.4</version>
+</dependency>
+----

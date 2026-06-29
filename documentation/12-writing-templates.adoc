@@ -1,0 +1,349 @@
+[[writing-templates]]
+= 12. Écriture de templates Celerio
+
+* <<templates-introduction>>
+* <<learn-by-example>>
+* <<templates-folder>>
+* <<create-templates-pack>>
+* <<template-name-conventions>>
+** <<bootstrap-template>>
+** <<per-entity-template>>
+** <<per-project-template>>
+** <<per-enum-template>>
+** <<per-cpk-template>>
+** <<static-files>>
+* <<template-context>>
+* <<entity-namers>>
+* <<create-entity-namer>>
+* <<celerio-spi>>
+* <<velocity2-changes>>
+
+[[templates-introduction]]
+== Introduction
+
+Les templates de génération de code Celerio sont écrits en link:https://velocity.apache.org/[Velocity 2.x] (version 2.4.x depuis la migration Java 25).
+
+Celerio peut exécuter des templates packagés dans un fichier jar ou des templates présents dans un dossier ordinaire.
+
+Un `pack de templates` est simplement un jar. Pour être exécuté par Celerio, ce jar doit être explicitement ajouté comme dépendance de Celerio.
+
+[[learn-by-example]]
+== Apprendre par l'exemple
+
+La façon la plus simple de démarrer avec les templates Celerio est de modifier des templates existants.
+
+Jaxio fournit les packs de templates Open Source suivants :
+
+* Angular 18 + Spring Boot 4 : link:https://github.com/jaxio/celerio-angular-quickstart[celerio-angular-quickstart]
+* Java EE 7 pur (backend + frontend, sans Spring) : link:https://github.com/jaxio/javaee-lab[javaee-lab]
+* Templates backend (avec Spring) : link:https://github.com/jaxio/pack-backend-jpa[pack-backend-jpa]
+* Templates frontend (avec Spring) : link:https://github.com/jaxio/pack-jsf2-spring-conversation[pack-jsf2-spring-conversation]
+
+[[templates-folder]]
+== Dossier de templates
+
+Avant de commencer, mettez à jour votre configuration Celerio pour spécifier l'emplacement du dossier de templates.
+
+Dans `celerio-template-packs.xml`, déclarez votre dossier de sources de templates :
+
+[source,xml]
+----
+<packs>
+  <!-- ... autres packs omis... -->
+  <pack name="pack-custom" path="src/main/my-pack" enable="true" />
+</packs>
+----
+
+Celerio s'attend à trouver dans le dossier `src/main/my-pack` 2 sous-dossiers :
+
+----
+src
+   |- main
+          |- my-pack
+                  |- META-INF
+                  |- celerio
+----
+
+[[create-templates-pack]]
+== Créer un pack de templates
+
+Un pack de templates est un ensemble de templates Celerio packagés dans un fichier jar. Le projet Maven doit avoir la structure suivante :
+
+----
+pom.xml
+src
+   |- main
+          |- resources
+                      |- META-INF
+                      |          |- celerio-pack.xml
+                      |
+                      |- celerio
+                                |- bootstrap
+                                |           |- pom.boot.vm.xml
+                                |
+                                |- pack-the-name-of-the-pack
+                                                          |- **/yourtemplate.e.vm.java
+----
+
+Le fichier `celerio-pack.xml` contient des méta-informations que le moteur Celerio utilise :
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<celerioPack xmlns="http://www.jaxio.com/schema/celerio">
+    <packName value="pack-the-name-of-the-pack"/>
+    <packDescription value="My sample pack"/>
+    <packDescription2 value="Generates entities, meta model, repositories..."/>
+    <packCommand value="mvn -Pdb,metadata,gen generate-sources"/>
+    <packCommandHelp value=""/>
+    <projectLink value="https://github.com/jaxio/my-pack"/>
+</celerioPack>
+----
+
+IMPORTANT: Le `packName` doit commencer par le préfixe `pack-`.
+
+[[template-name-conventions]]
+== Conventions de nommage des templates
+
+[[bootstrap-template]]
+=== Template bootstrap
+
+Un _template bootstrap_ n'est interprété que lorsque Celerio est exécuté en _mode bootstrap_.
+
+Son nom doit avoir la forme : `TemplateName.boot.vm.ext` ou `TemplateName.ext.boot.vm`
+
+Exemple : `pom.boot.vm.xml`
+
+[[per-entity-template]]
+=== Template par entité (`.e.vm`)
+
+Un **template par entité** est interprété pour chaque entité.
+Son nom doit avoir la forme : `TemplateName.e.vm.ext` ou `TemplateName.ext.e.vm`
+
+Exemple : `Controller.java.e.vm`
+
+[[per-project-template]]
+=== Template par projet (`.p.vm`)
+
+Un **template par projet** est interprété une seule fois par projet.
+Son nom doit avoir la forme : `TemplateName.p.vm.ext` ou `TemplateName.ext.p.vm`
+
+Exemple : `web.xml.p.vm`
+
+NOTE: Les templates `.p.vm` sont générés une seule fois et ne sont jamais écrasés s'ils ont été modifiés manuellement.
+
+[[per-enum-template]]
+=== Template par enum (`.enum.vm`)
+
+Un **template par enum** est interprété pour chaque enum.
+Son nom doit avoir la forme : `TemplateName.enum.vm.ext`
+
+Exemple : `EnumController.java.enum.vm`
+
+[[per-cpk-template]]
+=== Template par clé primaire composite (`.cpk.vm`)
+
+Un **template par clé primaire composite** est interprété pour chaque CPK.
+Son nom doit avoir la forme : `TemplateName.cpk.vm.ext`
+
+Exemple : `CompositePkBridge.java.cpk.vm`
+
+[[static-files]]
+=== Fichiers statiques
+
+Les fichiers statiques ne sont pas interprétés, ils sont simplement copiés tels quels par Celerio.
+
+[[template-context]]
+== Contexte du template
+
+Le contexte du template est le contexte d'exécution Velocity. Il expose votre métamodèle de projet et diverses facilités.
+
+=== output
+
+L'objet `output` a plusieurs rôles :
+
+==== `output` contrôle où écrire le résultat
+
+Au début de votre template, utilisez `output` pour spécifier où écrire le fichier généré :
+
+[source,velocity]
+----
+$output.java($Root,"MyClass")
+----
+
+Écrit le résultat sous `src/main/generated-java/your-root-package/MyClass.java`
+
+[source,velocity]
+----
+$output.java($WebSecurity, "LoginForm")##
+----
+
+Écrit le résultat sous `src/main/java/your-root-package/web/security/LoginForm.java`
+
+NOTE: Le nom de la classe courante est disponible via `$output.currentClass`
+
+==== `output` gère les imports Java
+
+[source,velocity]
+----
+$output.require("org.springframework.web.bind.annotation.RestController")##
+----
+
+Garantit que `import org.springframework.web.bind.annotation.RestController;` est présent dans le fichier généré.
+
+Utilisation conditionnelle :
+
+[source,velocity]
+----
+#if($something)
+$output.requireStatic("com.google.common.collect.Lists.newArrayList")
+$output.require("java.util.List")
+#end
+----
+
+==== `output` fournit des helpers pour annotations et imports
+
+[source,velocity]
+----
+$output.dynamicAnnotation("jakarta.persistence.Entity")
+----
+
+Retourne `@Entity` et s'assure que l'import `jakarta.persistence.Entity` est généré.
+
+=== project
+
+Le `project` est la racine du métamodèle. Il contient toutes les entités.
+
+=== entity
+
+L'`entity` référence l'entité courante lors du travail avec des templates par entité ou CPK.
+
+=== enum
+
+L'`enum` référence l'enum courant lors du travail avec des templates par enum.
+
+[[entity-namers]]
+== Namers d'entité
+
+Un namer d'entité permet de construire facilement des noms de var/méthode/classe dérivés du nom de l'entité courante.
+
+En supposant que le nom complet de l'entité courante est `com.example.domain.Bank`, voici les valeurs retournées par les méthodes du namer `model` :
+
+* `$entity.model.var` → `bank`
+* `$entity.model.type` → `Bank`
+* `$entity.model.fullType` → `com.example.Bank`
+* `$entity.model.packageName` → `com.example`
+* `$entity.model.vars` → `banks`
+* `$entity.model.getter` → `getBank`
+* `$entity.model.setter` → `setBank`
+
+Le namer `repository` :
+
+* `$entity.repository.var` → `bankRepository`
+* `$entity.repository.type` → `BankRepository`
+* `$entity.repository.fullType` → `com.example.repository.BankRepository`
+
+[[create-entity-namer]]
+== Créer un namer d'entité
+
+Pour créer un namer `acl` pour chaque entité, ajoutez dans `celerio-template-packs.xml` :
+
+[source,xml]
+----
+<packs>
+  <celerioTemplateContext>
+    <entityContextProperties>
+      <entityContextProperty property="acl" subPackage="security" suffix="Acl"/>
+    </entityContextProperties>
+  </celerioTemplateContext>
+  <pack name="pack-custom" path="src/main/celerio" enable="true" />
+</packs>
+----
+
+Puis dans votre template `entityAcl.java.e.vm` :
+
+[source,velocity]
+----
+$output.java($entity.acl)##
+
+public class $output.currentClass {
+    // var: $entity.acl.var
+    // type: $entity.acl.type
+}
+----
+
+[[celerio-spi]]
+== Celerio Service Provider Interface
+
+Celerio expose les SPI suivantes :
+
+* `ProjectSpi`
+* `EntitySpi`
+* `AttributeSpi`
+* `RelationSpi`
+
+Pour créer une extension, suivez la convention link:https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/ServiceLoader.html[ServiceLoader]. Votre extension doit être packagée dans un jar contenant vos classes et les fichiers de services attendus sous `META-INF/services/`.
+
+[[velocity2-changes]]
+== Variables Velocity 2.x — changements par rapport à Velocity 1.x
+
+IMPORTANT: Depuis la migration de Celerio vers Velocity 2.x, les variables de boucle automatiques `$velocityCount` et `$velocityHasNext` ont été **supprimées**. Si vous avez d'anciens templates qui les utilisent, vous devez les migrer.
+
+=== Variables supprimées
+
+[cols="2,2,2", options="header"]
+|===
+|Ancienne variable (Velocity 1.x)
+|Nouvelle variable (Velocity 2.x)
+|Description
+
+|`$velocityCount`
+|`$foreach.count`
+|Compteur de boucle (1-based)
+
+|`$velocityHasNext`
+|`$foreach.hasNext`
+|Vrai si l'itération suivante existe
+
+|`$velocityCount - 1`
+|`$foreach.index`
+|Index de boucle (0-based)
+|===
+
+=== Exemple de migration
+
+Velocity 1.x (OBSOLÈTE) :
+
+[source,velocity]
+----
+#foreach($attribute in $entity.currentAttributes.list)
+    private $attribute.type $attribute.var; // attribut n°$velocityCount
+    #if($velocityHasNext), #end
+#end
+----
+
+Velocity 2.x (CORRECT) :
+
+[source,velocity]
+----
+#foreach($attribute in $entity.currentAttributes.list)
+    private $attribute.type $attribute.var; // attribut n°$foreach.count
+    #if($foreach.hasNext), #end
+#end
+----
+
+=== Variables supplémentaires disponibles en Velocity 2.x
+
+[source,velocity]
+----
+#foreach($item in $list)
+    $foreach.count    ## compteur 1-based (remplace $velocityCount)
+    $foreach.index    ## index 0-based  (remplace $velocityCount - 1)
+    $foreach.hasNext  ## boolean        (remplace $velocityHasNext)
+    $foreach.isFirst  ## true pour le premier élément
+    $foreach.isLast   ## true pour le dernier élément
+    $foreach.owner    ## boucle parente (nested loops)
+#end
+----
+
+NOTE: Le renommage `$velocityCount` → `$foreach.count` affecte également la propriété globale `directive.foreach.counter_name` du moteur Velocity. Si vous l'avez configurée, mettez-la à jour.

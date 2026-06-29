@@ -1,0 +1,94 @@
+[[configuration-file]]
+= 10. Fichier de configuration
+
+== Fichier de configuration principal
+
+Le fichier de configuration Celerio principal se trouve par convention sous :
+
+`${basedir}/src/main/config/celerio-maven-plugin/celerio-maven-plugin.xml`
+
+Dans celerio-angular-quickstart, il est placé sous `quickstart-conf/celerio-maven-plugin.xml` (chemin configurable via la propriété `celerio-maven-plugin.configuration` dans `pom.xml`).
+
+Ce fichier de configuration doit respecter le schéma `celerio.xsd` présent dans le même répertoire.
+
+NOTE: Le goal `bootstrap` crée un fichier de configuration qui peut servir de point de départ.
+
+== Diviser le tag `entityConfigs`
+
+Le tag `entityConfigs` peut être déclaré dans le fichier de configuration principal ET/OU dans des sous-fichiers de configuration inclus dans le fichier principal. Pour ces fichiers inclus, seul le tag `entityConfigs` est chargé par Celerio.
+
+Exemple :
+
+[source,xml]
+----
+<celerio>
+  <includes>
+    <include filename="celerio-maven-plugin-secondary.xml"/>
+  </includes>
+  <entityConfigs>
+    <entityConfig tableName="BOOK" subPackage="fromMainConfig"/>
+  </entityConfigs>
+</celerio>
+----
+
+Et voici le fichier inclus :
+
+[source,xml]
+----
+<celerio>
+  <entityConfigs>
+    <entityConfig tableName="ACCOUNT" subPackage="fromIncludeConfig"/>
+  </entityConfigs>
+</celerio>
+----
+
+== Fichier de configuration des packs de templates
+
+Les packs de templates peuvent être déclarés dans le fichier de configuration principal OU dans le fichier `${basedir}/src/main/config/celerio-maven-plugin/celerio-template-packs.xml` (configurable via `celerio-maven-plugin.packs.configuration`).
+
+Quand ce fichier est présent, Celerio charge le tag `packs` depuis lui au lieu du fichier de configuration principal.
+
+[source,xml]
+----
+<celerio>
+  <configuration>
+    <packs>
+      <pack name="pack-angular" enable="true">
+        <filenames><!-- ne pas générer ces fichiers -->
+          <filename include="false" pattern="src/main/webapp/package.json" />
+        </filenames>
+      </pack>
+    </packs>
+  </configuration>
+</celerio>
+----
+
+Ce fichier séparé a été introduit principalement pour les projets Maven multi-modules. Les différents modules partagent le même `celerio-maven-plugin.xml` mais utilisent leur propre `celerio-template-packs.xml`.
+
+== Exemple de configuration pour celerio-angular-quickstart
+
+[source,xml]
+----
+<!-- quickstart-conf/celerio-maven-plugin.xml -->
+<celerio xmlns="http://www.jaxio.com/schema/celerio">
+  <configuration>
+    <conventions>
+      <rootPackage value="com.mycompany.myapp"/>
+    </conventions>
+  </configuration>
+  <entityConfigs>
+    <entityConfig tableName="USER">
+      <columnConfigs>
+        <columnConfig columnName="LOGIN" fieldName="login"/>
+        <columnConfig columnName="PASSWORD" fieldName="password"/>
+        <columnConfig columnName="IS_ENABLED" fieldName="enabled"/>
+      </columnConfigs>
+    </entityConfig>
+    <entityConfig tableName="ROLE">
+      <columnConfigs>
+        <columnConfig columnName="ROLE_NAME" fieldName="roleName"/>
+      </columnConfigs>
+    </entityConfig>
+  </entityConfigs>
+</celerio>
+----

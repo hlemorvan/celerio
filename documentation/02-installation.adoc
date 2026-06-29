@@ -1,0 +1,97 @@
+[[installation]]
+= 2. Installation de Celerio
+
+* <<requirements>>
+** <<jdk-25>>
+** <<maven-3>>
+* <<celerio-install>>
+** <<bootstrap-a-project>>
+** <<celerio-branding>>
+
+[[requirements]]
+== Prérequis
+
+[[jdk-25]]
+=== JDK 25 ou supérieur
+
+Celerio 4.0.24-SNAPSHOT requiert **Java 25** (ou toute version LTS récente ≥ 21).
+
+Téléchargez et installez le JDK 25 depuis link:https://adoptium.net/[Eclipse Temurin] ou link:https://jdk.java.net/25/[jdk.java.net].
+
+Exemple sous Linux avec Temurin 25.0.2 :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+export PATH=$JAVA_HOME/bin:$PATH
+----
+
+Vérifiez l'installation :
+
+[source,bash]
+----
+javac -version
+----
+
+Résultat attendu :
+
+[source]
+----
+javac 25.0.2
+----
+
+IMPORTANT: Définissez toujours `JAVA_HOME` avant d'invoquer Maven pour les profils `db`, `metadata` et `gen`. Celerio utilise le JDK pour compiler les templates et le code généré.
+
+[[maven-3]]
+=== Maven 3.9+
+
+Celerio est distribué sous forme de plugin Maven. Maven **3.9 ou supérieur** est requis.
+
+Téléchargez et installez Maven 3.9+ depuis link:https://maven.apache.org/download.cgi[maven.apache.org].
+
+Vérifiez l'installation :
+
+[source,bash]
+----
+mvn -v
+----
+
+Résultat attendu :
+
+[source]
+----
+Apache Maven 3.9.x (...)
+Java version: 25.0.2, ...
+----
+
+[[celerio-install]]
+== Celerio
+
+[[bootstrap-a-project]]
+=== Démarrer un projet avec Celerio
+
+Tapez la commande suivante dans une console :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+mvn com.jaxio.celerio:bootstrap-maven-plugin:bootstrap
+----
+
+Puis suivez les instructions du chapitre <<bootstrap-sample>>.
+
+NOTE: Cette commande peut prendre un moment la première fois car Maven doit télécharger tous les plugins et dépendances nécessaires.
+
+[[celerio-branding]]
+=== Personnalisation Celerio (branding)
+
+La première fois que Celerio est exécuté, il crée le fichier `.celerio/branding.properties` dans votre répertoire home ainsi que `.celerio/logo.png`.
+
+Pour changer le package racine par défaut du code source généré, ouvrez ce fichier et modifiez la propriété :
+
+[source,properties]
+----
+root_package=com.jaxio
+----
+
+Vous pouvez aussi remplacer l'image `logo.png` par défaut par la vôtre !

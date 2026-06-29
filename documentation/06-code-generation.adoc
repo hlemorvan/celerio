@@ -1,0 +1,126 @@
+[[code-generation]]
+= 6. Génération de code
+
+* <<generation-principle>>
+* <<celerio-plugin-details>>
+* <<generation-simple-usage>>
+* <<generation-where>>
+
+[[generation-principle]]
+== Principe
+
+La génération de code est effectuée par le goal `generate` du `celerio-maven-plugin`, un plugin Maven fourni par Jaxio.
+
+La génération de code est pilotée par plusieurs facteurs :
+
+* _Les méta-données de base de données_ : elles servent de modèle d'entrée principal. Les contraintes des colonnes telles que `NOT NULL`, les clés étrangères, etc. sont exploitées par Celerio dans le processus de génération.
+* _Les conventions Celerio_
+* _La configuration Celerio_
+* _Les packs de templates Celerio_
+* _Les modifications du code généré_
+
+image::images/celerio-generation.png[Facteurs de génération de code]
+
+Comme pour l'extraction du schéma, la génération n'a pas besoin d'être effectuée à chaque build. _Pour éviter les générations inutiles_, l'approche la plus simple est de déclarer un profil Maven dédié à la génération.
+
+[[celerio-plugin-details]]
+== Détails du celerio-maven-plugin
+
+=== Nom complet
+
+* name: `com.jaxio.celerio:celerio-maven-plugin`
+* goal: `generate`
+* phase Maven: `generate-sources`
+
+Ce plugin utilise le fichier `metadata.xml` produit par le goal `extract-metadata` du `dbmetadata-maven-plugin`.
+
+=== Attributs
+
+==== skip
+* expression: `celerio-maven-plugin.skip`
+* valeur par défaut: `false`
+* description: Doit-on ignorer la génération ?
+
+==== xmlConfiguration
+* expression: `celerio-maven-plugin.configuration`
+* valeur par défaut: `${basedir}/src/main/config/celerio-maven-plugin/celerio-maven-plugin.xml`
+* description: Chemin relatif vers le fichier de configuration Celerio.
+
+==== xmlTemplatePacksOverride
+* expression: `celerio-maven-plugin.packs.configuration`
+* valeur par défaut: `${basedir}/src/main/config/celerio-maven-plugin/celerio-template-packs.xml`
+* description: Chemin relatif vers un fichier de configuration Maven dédié à surcharger la définition des packs de templates. Utile pour les projets multi-modules.
+
+==== xmlMetadata
+* expression: `celerio-maven-plugin.xml.metadata`
+* valeur par défaut: `${basedir}/src/main/config/celerio-maven-plugin/metadata.xml`
+* description: Chemin relatif vers le fichier `metadata.xml`. Si ce fichier existe, il sera utilisé ; sinon Celerio accèdera directement à la base de données.
+
+==== outputDirectory
+* expression: `celerio-maven-plugin.outputDir`
+* valeur par défaut: `${basedir}`
+* description: Répertoire de base pour les fichiers générés.
+
+[[generation-simple-usage]]
+== Utilisation simple
+
+Dans votre `pom.xml`, créez un profil dédié pour exécuter le plugin :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+mvn -Pgen generate-sources
+----
+
+Voici le détail du profil `gen` :
+
+[source,xml]
+----
+<profile>
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <!-- Generate the code using Celerio -->
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <id>gen</id>
+  <build>
+    <defaultGoal>generate-sources</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>com.jaxio.celerio</groupId>
+        <artifactId>celerio-maven-plugin</artifactId>
+        <version>${celerio-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>Generates files using the extracted database schema.</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>com.jaxio.celerio.packs</groupId>
+            <artifactId>pack-angular</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</profile>
+----
+
+NOTE: Le pack `pack-angular` doit être installé dans votre dépôt Maven local. Pour celerio-angular-quickstart, lancez `mvn -f pack-angular/pom.xml install` d'abord.
+
+[[generation-where]]
+== Avancé : Où générer ?
+
+Par défaut, les fichiers générés par Celerio sont à la racine du répertoire où se trouve votre `pom.xml` (le répertoire Maven `${baseDir}`).
+
+Vous pouvez configurer un répertoire différent en utilisant l'expression `${celerio-maven-plugin.outputDir}`.
+
+NOTE: L'emplacement d'un fichier généré est défini dans le template de génération relativement à `outputDir`.
+
+L'emplacement des fichiers Java générés dépend de `outputDir` :
+
+* Quand `outputDir == baseDir` : les fichiers Java sont générés sous `${celerio-maven-plugin.outputDir}/src/main/generated-java`
+* Quand `outputDir != baseDir` : les fichiers Java sont générés sous `${celerio-maven-plugin.outputDir}/src/main/java`

@@ -1,0 +1,106 @@
+[[introduction]]
+= 1. Introduction
+
+* <<celerio>>
+** <<database-schema-extractor-tool>>
+** <<celerio-engine>>
+** <<template-packs>>
+* <<when-to-use-celerio>>
+** <<spread-best-practices>>
+** <<application-rewriting>>
+** <<rapid-prototyping>>
+** <<new-application>>
+** <<training>>
+* <<what-to-expect>>
+
+[[celerio]]
+== Celerio
+
+Celerio est un générateur de code conçu pour produire les fondations d'applications orientées données.
+
+Celerio est distribué en tant que plugin Maven, ce qui facilite son intégration dans le développement de vos projets.
+
+Celerio est écrit en Java. Il exécute des templates de génération (écrits en link:https://velocity.apache.org/[Velocity 2.x]) qui produisent du code source Java, des fichiers XML, TypeScript, etc. Jaxio fournit des templates prêts à l'emploi, mais vous pouvez aussi créer les vôtres.
+
+Celerio utilise un modèle entité-relation comme point de départ. Ce modèle peut être produit par n'importe quel outil tant qu'il respecte le format attendu par Celerio. En pratique, Jaxio fournit un outil qui extrait un schéma de base de données existant pour produire ce modèle initial. Ce modèle peut être affiné par configuration.
+
+Celerio est composé de trois composants principaux :
+
+* un outil d'extraction de schéma de base de données
+* le moteur Celerio (Celerio Engine)
+* des packs de templates
+
+image::images/celerio-phases.png[Phases de Celerio]
+
+[[database-schema-extractor-tool]]
+=== Outil d'extraction du schéma de base de données
+
+Cet outil inverse un schéma de base de données existant en utilisant l'API JDBC Meta Data. Il se connecte à votre base de données et extrait les diverses méta-informations : noms des tables, noms des colonnes, contraintes, relations, commentaires, etc. Le résultat de l'extraction est écrit dans un fichier XML. Cet outil fonctionne en mode lecture seule, il ne lit pas vos données réelles et ne modifie pas votre base de données.
+
+[[celerio-engine]]
+=== Moteur Celerio
+
+Le moteur Celerio s'appuie sur le modèle entité-relation brut extrait par l'outil d'extraction et sur un fichier de configuration qui indique à Celerio comment affiner ce modèle.
+
+En effet, le modèle extrait ne contient pas toutes les méta-informations — c'est à vous de l'enrichir.
+
+Par exemple, via la configuration, vous pouvez ajouter de l'héritage à votre modèle. À partir de ce modèle enrichi, Celerio construit un graphe en mémoire et laisse les templates de génération y accéder lors de leur exécution.
+
+[[template-packs]]
+=== Packs de templates
+
+Les templates de génération exécutés par Celerio sont regroupés dans des fichiers jar appelés _packs de templates_.
+
+Jaxio fournit des packs de templates Open Source, mais vous pouvez aussi écrire les vôtres :
+
+* Angular 18 + PrimeNG 17 + Spring Boot 4 : link:https://github.com/jaxio/celerio-angular-quickstart[celerio-angular-quickstart]
+* Java EE 7 pur (backend + frontend, sans Spring) : link:https://github.com/jaxio/javaee-lab[javaee-lab]
+* Templates backend (avec Spring) : link:https://github.com/jaxio/pack-backend-jpa[pack-backend-jpa]
+* Templates frontend (avec Spring) : link:https://github.com/jaxio/pack-jsf2-spring-conversation[pack-jsf2-spring-conversation]
+
+Celerio charge tous les packs de templates trouvés sur le classpath ; assurez-vous de les ajouter comme dépendances jar lors de l'exécution de Celerio.
+
+Par défaut, Celerio exécute tous les templates trouvés dans un pack, mais cela peut être configuré pour filtrer certains templates.
+
+Le code source généré respecte les standards industriels et les bonnes pratiques. Il est organisé dans une structure de projet suivant les conventions Maven.
+
+_Last but not least : Celerio n'est pas requis à l'exécution. Il n'y a aucun lock-in._
+
+[[when-to-use-celerio]]
+== Quand utiliser Celerio ?
+
+_Celerio cible les applications qui utilisent une base de données relationnelle et dont le schéma de base de données est proche de la couche domaine._ À partir de là, Celerio peut être utilisé dans différents contextes.
+
+[[spread-best-practices]]
+=== Diffuser vos bonnes pratiques et votre architecture
+
+De nouveaux packs de templates peuvent être facilement développés pour prendre en compte vos bibliothèques internes et les bonnes pratiques de votre entreprise. Une fois ces packs prêts, ils peuvent être déployés comme n'importe quel autre jar dans votre dépôt Maven privé et être utilisés par vos différentes équipes.
+
+[[application-rewriting]]
+=== Réécriture d'application
+
+Décider de réécrire une application en Java est une décision difficile. Celerio aide votre équipe existante à faire le premier pas vers la réécriture et soutient votre équipe durant le cycle de développement.
+
+[[rapid-prototyping]]
+=== Prototypage rapide
+
+Celerio augmente drastiquement vos chances de succès : il vous donne la possibilité de prototyper extrêmement vite sans compromis sur la qualité et l'architecture.
+
+[[new-application]]
+=== Nouvelle application
+
+Écrire une application from scratch est aussi possible avec Celerio. Au lieu de concevoir votre couche domaine en Java, vous concevez directement votre schéma de base de données.
+
+[[training]]
+=== Formation
+
+Le code généré par Celerio peut être utilisé comme matériel de formation. Le code est lisible, bien organisé, testé unitairement et documenté.
+
+[[what-to-expect]]
+== Que peut-on attendre de Celerio ?
+
+Vous pouvez attendre un gain de 30% sur le développement de votre application.
+
+Il est important de comprendre que Celerio n'est pas là pour remplacer le cerveau de vos développeurs. Celerio est là pour leur permettre de se concentrer sur la vraie valeur de votre application finale. Celerio automatise les tâches fastidieuses et répétitives d'écriture du squelette de votre projet Java.
+
+Pas « magique », mais pas non plus trivial : Celerio va bien au-delà d'un simple copier-coller. Il couvre des sujets comme la persistance, l'héritage, le cache de second niveau, la sécurité, l'injection de dépendances, la distribution, la localisation, les tests unitaires, etc.

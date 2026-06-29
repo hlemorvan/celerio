@@ -1,0 +1,518 @@
+[[migration-guide]]
+= 15. Guide de migration : Spring Boot 1.5 + Java 8 → Spring Boot 4 + Java 25
+
+Ce chapitre documente tous les changements effectués pour migrer le projet `celerio-angular-quickstart` et le moteur Celerio de leur état d'origine (Spring Boot 1.5, Java 8, Angular 5) vers les versions actuelles (Spring Boot 4.0.1, Java 25, Angular 18).
+
+* <<migration-overview>>
+* <<migration-celerio-engine>>
+** <<jibx-to-jaxb>>
+** <<spring4-to-spring6>>
+** <<javax-to-jakarta-engine>>
+** <<velocity-migration>>
+** <<tests-junit5>>
+* <<migration-pack-angular>>
+** <<javax-to-jakarta-templates>>
+** <<velocity2-templates>>
+** <<spring-security6>>
+** <<springdoc-swagger>>
+* <<migration-quickstart>>
+** <<pom-xml-changes>>
+** <<h2v2-sql>>
+** <<application-yml>>
+* <<migration-table>>
+
+[[migration-overview]]
+== Vue d'ensemble
+
+[cols="2,2,2", options="header"]
+|===
+|Composant
+|Avant (2017)
+|Après (2026)
+
+|Java
+|1.8
+|25 (Temurin 25.0.2)
+
+|Spring Boot
+|1.5.9.RELEASE
+|4.0.1
+
+|Spring Framework
+|4.x (dans celerio-engine)
+|6.2.x
+
+|Angular
+|5
+|18
+
+|PrimeNG
+|5
+|17
+
+|Velocity (celerio-engine)
+|1.6.2
+|2.4.1 (engine-core)
+
+|H2 Database
+|1.4.x
+|2.3.232
+
+|Hibernate
+|5.x
+|7.x (via Spring Boot 4)
+
+|Jakarta EE
+|javax.* (Java EE 8)
+|jakarta.* (Jakarta EE 11)
+
+|Spring Security
+|4.x
+|6.x
+
+|Swagger/OpenAPI
+|springfox 2.x
+|springdoc-openapi 3.0.0
+
+|JUnit
+|4 (celerio-engine)
+|5 (JUnit Jupiter)
+
+|JAXB (celerio-engine)
+|JiBX 1.2.6
+|Jakarta JAXB 4.x
+
+|Guava
+|18.0 (transitif)
+|33.4.8-jre (explicite)
+|===
+
+[[migration-celerio-engine]]
+== Migration du moteur Celerio (`/home/herve/celerio/`)
+
+[[jibx-to-jaxb]]
+=== JiBX → JAXB (changement majeur)
+
+JiBX 1.2.6 utilisait BCEL pour manipuler le bytecode — incompatible avec le système de modules Java 9+. Le projet JiBX est mort depuis des années.
+
+**Changements effectués** :
+
+1. Suppression des dépendances JiBX (`jibx-run`, `jibx-tools`, `jibx-extras`)
+2. Suppression du `maven-jibx-plugin` et du `maven-antrun-plugin` (qui l'invoquait)
+3. Suppression de `src/main/config/customization.xml`
+4. Ajout de JAXB runtime (`jakarta.xml.bind-api 4.0.2` + `jaxb-runtime 4.0.5`)
+5. Annotation de toutes les classes de configuration avec JAXB (`@XmlRootElement`, `@XmlAccessorType`, `@XmlAttribute`, `@XmlElement`, `@XmlElementWrapper`, `@XmlTransient`)
+6. Remplacement de `JibxMarshaller` par `Jaxb2Marshaller` dans `applicationContext-celerio.xml`
+
+**Bugs découverts lors du test end-to-end** :
+
+JAXB avec `@XmlAccessorType(FIELD)` affecte directement les champs sans passer par les setters, contrairement à JiBX. Les maps dérivées (annotées `@XmlTransient`) restent vides après désérialisation XML.
+
+[cols="2,1,3", options="header"]
+|===
+|Fichier
+|Bug
+|Correction
+
+|`Config.java`
+|`ForbiddenClassException` XStream
+|Ajout d'une allowlist XStream : `XSTREAM.allowTypesByWildcard(new String[] {"com.jaxio.celerio.**", "java.util.**", "java.lang.**"})`
+
+|`Metadata.java`
+|`tablesByName` vide après JAXB
+|Ajout `afterUnmarshal()` qui appelle `setTables(tables)` et reconstruit les maps de chaque table
+
+|`Table.java`
+|`columnsByName` vide après JAXB
+|Ajout `afterUnmarshal()` → `setColumns()`, `setIndexes()`, `setImportedKeys()`
+
+|`EntityConfig.java`
+|`columnConfigByColumnName` vide après JAXB
+|Ajout `afterUnmarshal()` → `setColumnConfigs(columnConfigs)`
+
+|`Celerio.java`
+|`sharedEnumConfigs` non chargés
+|Correction `@XmlElement(name = "sharedEnumConfig")` (était `"enumConfig"`)
+|===
+
+[[spring4-to-spring6]]
+=== Spring 4.x → Spring 6.x
+
+Spring 4.x ne supporte pas Java 17+. Spring 6.x exige Java 17 minimum.
+
+**Changements** :
+* Version Spring : `4.2.2.RELEASE` → `6.2.7`
+* Schémas XML Spring : `spring-beans-4.2.xsd` → sans version (`spring-beans.xsd`)
+* Suppression de `spring-context-support` + `aspectjweaver` (LTW obsolète)
+* Suppression de `VelocityEngineFactoryBean` (supprimée dans Spring 5) → configuration directe via `@Bean` dans `CelerioConfig.java`
+* Remplacement `JibxMarshaller` → `Jaxb2Marshaller`
+
+[[javax-to-jakarta-engine]]
+=== javax.* → jakarta.* (moteur Celerio)
+
+[cols="2,2", options="header"]
+|===
+|Ancien import
+|Nouveau import
+
+|`javax.persistence.*`
+|`jakarta.persistence.*`
+
+|`javax.validation.*`
+|`jakarta.validation.*`
+|===
+
+NOTE: `javax.xml.*`, `javax.sql.*`, `javax.lang.model.*` sont des APIs JDK standard — elles restent `javax.*` même en Java 25.
+
+[[velocity-migration]]
+=== Velocity 1.6.2 → velocity-engine-core 2.4.1
+
+* Mise à jour des clés de configuration Velocity 2.x (noms de propriétés renommés)
+* `StringUtils.normalizePath` → `StringUtils.normalize`
+* Suppression de `Log4JLogChute` → logger SLF4J natif
+* log4j 1.x supprimé → logback-classic 1.5.18
+* SLF4J 1.5.10 → 2.0.16
+
+**Important pour les templates** : Les variables `$velocityCount` et `$velocityHasNext` ont été supprimées en Velocity 2.x. Voir <<velocity2-changes>> pour les remplacements.
+
+[[tests-junit5]]
+=== Migration tests : JUnit 4 → JUnit 5
+
+[cols="2,2", options="header"]
+|===
+|Avant (JUnit 4)
+|Après (JUnit 5)
+
+|`@RunWith(SpringJUnit4ClassRunner.class)`
+|`@ExtendWith(SpringExtension.class)`
+
+|`import org.junit.Test`
+|`import org.junit.jupiter.api.Test`
+
+|`@Before`
+|`@BeforeEach`
+
+|`@Ignore`
+|`@Disabled`
+
+|`Assert.assertEquals`
+|`Assertions.assertEquals`
+
+|`fest-assert` : `assertThat(x).isEqualTo(y)`
+|AssertJ : `assertThat(x).isEqualTo(y)` (API identique !)
+
+|`mockito-all`
+|`mockito-core 5.15.2` + `mockito-junit-jupiter`
+|===
+
+Résultat : `Tests run: 94, Failures: 0, Errors: 0, Skipped: 3`
+
+[[migration-pack-angular]]
+== Migration des templates `pack-angular` (`/home/herve/celerio-angular-quickstart/pack-angular/`)
+
+[[javax-to-jakarta-templates]]
+=== javax.* → jakarta.* dans les templates
+
+[cols="2,2,2", options="header"]
+|===
+|Template
+|Avant
+|Après
+
+|`EntityDTOService.java.e.vm`
+|`javax.inject.Inject`
+|`jakarta.inject.Inject`
+
+|`EntityResource.java.e.vm`
+|`javax.inject.Inject`
+|`jakarta.inject.Inject`
+
+|`SecurityConfiguration.java.p.vm`
+|`javax.inject.Inject`
+|`jakarta.inject.Inject`
+
+|`AjaxAuthenticationFailureHandler.java.p.vm`
+|`javax.servlet.http.*`
+|`jakarta.servlet.http.*`
+
+|`AjaxAuthenticationSuccessHandler.java.p.vm`
+|`javax.servlet.http.*`
+|`jakarta.servlet.http.*`
+
+|`AlwaysSendUnauthorized401.java.p.vm`
+|`javax.servlet.http.*`
+|`jakarta.servlet.http.*`
+
+|`SecurityResource.java.p.vm`
+|`javax.servlet.http.*`
+|`jakarta.servlet.http.*`
+
+|`Entity.java.e.vm`
+|`javax.persistence.*`
+|`jakarta.persistence.*`
+
+|`EntityMeta_.java.e.vm`
+|`javax.persistence.metamodel.*`
+|`jakarta.persistence.metamodel.*`
+
+|`CompositePk.java.cpk.vm`
+|`javax.persistence.*`
+|`jakarta.persistence.*`
+|===
+
+=== ValidationAttribute : jakarta.validation (moteur)
+
+Le moteur Celerio générais des imports `org.hibernate.validator.constraints.*` et `javax.validation.*` dans les entités.
+
+**Fichier corrigé** : `celerio-engine/src/main/java/com/jaxio/celerio/model/support/validation/ValidationAttribute.java`
+
+[cols="2,2", options="header"]
+|===
+|Avant
+|Après
+
+|`org.hibernate.validator.constraints.NotEmpty`
+|`jakarta.validation.constraints.NotEmpty`
+
+|`org.hibernate.validator.constraints.Email`
+|`jakarta.validation.constraints.Email`
+
+|`javax.validation.constraints.NotNull`
+|`jakarta.validation.constraints.NotNull`
+
+|`javax.validation.constraints.Size`
+|`jakarta.validation.constraints.Size`
+
+|`javax.validation.constraints.Digits`
+|`jakarta.validation.constraints.Digits`
+|===
+
+[[velocity2-templates]]
+=== Velocity 2.x : `$velocityCount` → `$foreach.count`
+
+37 occurrences de `$velocityCount` et 10 occurrences de `$velocityHasNext` ont été remplacées dans les templates :
+
+[cols="3,1,1", options="header"]
+|===
+|Fichier template
+|Remplacements count
+|Remplacements hasNext
+
+|`domain/Entity.java.e.vm`
+|16
+|3
+
+|`domain/EntityMeta_.java.e.vm`
+|6
+|0
+
+|`domain/CompositePk.java.cpk.vm`
+|2
+|2
+
+|`domain/CompositePk_.java.cpk.vm`
+|1
+|0
+
+|`domain/Enum.java.enum.vm`
+|0
+|2
+
+|`dto/EntityDTOService.java.e.vm`
+|1
+|0
+
+|`web/.../entity.ts.e.vm`
+|3
+|1 (via hasNext)
+
+|`web/.../entity-list.component.ts.e.vm`
+|0
+|2
+
+|`web/.../app.component.ts.p.vm`
+|0
+|1
+|===
+
+[[spring-security6]]
+=== Spring Security 6+ : `{noop}` prefix et `WebSecurityCustomizer`
+
+**Template `UserDetailsServiceImpl.java.p.vm`** : ajout du préfixe `{noop}` pour les mots de passe hardcodés (fallback sans entité Account) :
+
+[source,velocity]
+----
+if ("user".equals(username)) {
+    String password = "{noop}user";
+    // ...
+}
+if ("admin".equals(username)) {
+    String password = "{noop}admin";
+    // ...
+}
+----
+
+**Template `SecurityConfiguration.java.p.vm`** : migration complète de l'API Spring Security :
+* Suppression de l'héritage `WebSecurityConfigurerAdapter`
+* `@EnableGlobalMethodSecurity` → `@EnableMethodSecurity`
+* `configure(WebSecurity)` → bean `WebSecurityCustomizer`
+* `configure(HttpSecurity)` → bean `SecurityFilterChain`
+* `antMatchers` → `requestMatchers`
+
+[[springdoc-swagger]]
+=== springfox 2.x → springdoc-openapi 3.0.0
+
+[cols="2,2", options="header"]
+|===
+|Avant (springfox)
+|Après (springdoc)
+
+|`springfox-swagger2` + `springfox-swagger-ui`
+|`springdoc-openapi-starter-webmvc-ui`
+
+|`@ApiOperation`, `@ApiParam`
+|Annotations standard OpenAPI 3 ou autodétection
+
+|URL Swagger UI : `/swagger-ui.html`
+|URL Swagger UI : `/swagger-ui/index.html`
+
+|URL API docs : `/v2/api-docs`
+|URL API docs : `/v3/api-docs`
+|===
+
+Endpoints à ignorer dans `WebSecurityCustomizer` :
+[source,java]
+----
+.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+----
+
+[[migration-quickstart]]
+== Migration du projet quickstart
+
+[[pom-xml-changes]]
+=== Changements dans `quickstart/pom.xml`
+
+[cols="2,2,2", options="header"]
+|===
+|Propriété
+|Avant
+|Après
+
+|Spring Boot parent
+|`1.5.9.RELEASE`
+|`4.0.1`
+
+|`java.version`
+|`1.8`
+|`25`
+
+|H2 version
+|`1.4.187`
+|`2.3.232`
+
+|H2 URL
+|`jdbc:h2:~/.h2/angulardb;MVCC=TRUE;FILE_LOCK=NO`
+|`jdbc:h2:${project.build.directory}/db/angulardb`
+
+|`javax.inject`
+|`javax.inject:javax.inject:1`
+|`jakarta.inject:jakarta.inject-api:2.0.1`
+
+|Swagger
+|`io.springfox:springfox-swagger2:2.x` + `springfox-swagger-ui`
+|`org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0`
+
+|Guava
+|(transitif, non déclaré)
+|`com.google.guava:guava:33.4.8-jre` (explicite)
+|===
+
+Supprimées :
+* `org.hibernate:hibernate-java8` (intégré Hibernate 6+)
+* `org.mockito:mockito-all` → remplacé par `mockito-core` via `spring-boot-starter-test`
+* `org.easytesting:fest-assert` → remplacé par AssertJ via `spring-boot-starter-test`
+* `com.fasterxml.jackson.datatype:jackson-datatype-jsr310` (auto-configuré Spring Boot 3+)
+
+[[h2v2-sql]]
+=== Script SQL H2 v2 (`quickstart-conf/01-create.sql`)
+
+Changements principaux :
+
+[cols="2,2", options="header"]
+|===
+|Avant (H2 1.x)
+|Après (H2 2.x)
+
+|`id int not null IDENTITY`
+|`id int not null GENERATED BY DEFAULT AS IDENTITY`
+
+|`CREATE TABLE USER (...)`
+|`CREATE TABLE "USER" (...)` — `USER` est mot réservé H2 2.x
+
+|`password varchar(100) not null`
+|`password varchar(100) not null` — valeur `'admin'`
+
+|INSERT password: `'admin'`
+|INSERT password: `'{noop}admin'` — préfixe Spring Security 6+
+|===
+
+[[application-yml]]
+=== `application.yml`
+
+Changements Spring Boot 4 :
+
+[cols="2,2", options="header"]
+|===
+|Avant
+|Après
+
+|`security.basic.enabled: false`
+|Supprimé (auto-configuration Spring Boot 3+)
+
+|`spring.profiles:`
+|`spring.config.activate.on-profile:`
+
+|`spring.resources.chain.cache`
+|`spring.web.resources.chain.cache`
+
+|`server.port: 8080`
+|`server.port: 8081` (éviter conflits avec Docker/système)
+|===
+
+[[migration-table]]
+== Tableau récapitulatif des commandes
+
+[cols="1,2", options="header"]
+|===
+|Action
+|Commande
+
+|Définir JAVA_HOME
+|`export JAVA_HOME=/home/herve/jdk-25.0.2+10`
+
+|Rebuilder le moteur Celerio
+|`cd /home/herve/celerio && mvn install -DskipTests`
+
+|Installer pack-angular
+|`mvn -f pack-angular/pom.xml install`
+
+|Tout en une commande (DB + extraction + génération)
+|`JAVA_HOME=/home/herve/jdk-25.0.2+10 mvn -f quickstart/pom.xml -Pdb,metadata,gen generate-sources`
+
+|Compiler
+|`JAVA_HOME=/home/herve/jdk-25.0.2+10 mvn -f quickstart/pom.xml compile`
+
+|Lancer l'application
+|`JAVA_HOME=/home/herve/jdk-25.0.2+10 mvn -f quickstart/pom.xml spring-boot:run`
+
+|Lancer le frontend Angular
+|`cd quickstart/src/main/webapp && npm install && npm start`
+|===
+
+== Ressources complémentaires
+
+* link:https://spring.io/blog/2024/08/23/spring-boot-4-0-migration-guide[Spring Boot 4 Migration Guide]
+* link:https://github.com/spring-projects/spring-security/wiki/Spring-Security-6-Migration-Guide[Spring Security 6 Migration Guide]
+* link:https://h2database.com/html/changelog.html[H2 2.x Changelog]
+* link:https://velocity.apache.org/engine/2.0/upgrading.html[Velocity 2.0 Upgrade Guide]
+* link:https://github.com/jaxio/celerio-angular-quickstart[celerio-angular-quickstart sur GitHub]

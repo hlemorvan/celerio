@@ -1,0 +1,163 @@
+[[database-extraction]]
+= 5. Extraction du schéma de base de données
+
+* <<extraction-principle>>
+* <<dbmetadata-plugin-details>>
+* <<extraction-simple-usage>>
+
+[[extraction-principle]]
+== Principe
+
+L'extraction du schéma de base de données est effectuée par le goal `extract-metadata` du `dbmetadata-maven-plugin`, un plugin Maven fourni par Jaxio.
+
+Ce plugin se connecte à une base de données relationnelle via JDBC, récupère les méta-données du schéma et les écrit dans un fichier XML nommé `metadata.xml`.
+
+NOTE: Le fichier metadata produit par le plugin dbmetadata n'est pas destiné à être édité manuellement. Si vous avez besoin de modifier des paramètres, vous devriez soit modifier votre schéma de base de données, soit utiliser le fichier de configuration de Celerio.
+
+Bien que l'extraction soit assez simple, elle peut prendre plusieurs minutes sur de grands schémas de base de données (ex : plus de 200 tables). _Pour éviter les extractions inutiles_, l'approche la plus simple est de déclarer un profil Maven dédié à l'extraction et de l'activer uniquement quand c'est nécessaire (i.e. chaque fois que vous modifiez le schéma de base de données).
+
+Le fichier `metadata.xml` produit par ce plugin est utilisé par le goal `generate` de Celerio.
+
+[[dbmetadata-plugin-details]]
+== Détails du dbmetadata-maven-plugin
+
+=== Nom complet
+
+* name: `com.jaxio.celerio:dbmetadata-maven-plugin`
+* goal: `extract-metadata`
+* phase Maven: `generate-sources`
+
+=== Attributs
+
+==== skip
+* expression: `celerio-maven-plugin.skip`
+* valeur par défaut: `false`
+* description: Doit-on ignorer l'extraction ? Utile pour désactiver via profil.
+
+==== jdbcDriver
+* expression: `jdbc.driver`
+* description: Classe du driver JDBC
+* exemple: `org.h2.Driver`
+
+==== jdbcUrl
+* expression: `jdbc.url`
+* description: URL JDBC de connexion à votre base de données.
+* exemple H2 v2: `jdbc:h2:~/.h2/sampledatabase`
+
+NOTE: Pour H2 2.x, ne plus utiliser `MVCC=TRUE` ni `FILE_LOCK=NO` dans l'URL.
+
+==== jdbcUser
+* expression: `jdbc.user`
+* description: Utilisateur JDBC avec privilèges d'accès aux méta-données.
+
+==== jdbcPassword
+* expression: `jdbc.password`
+* description: Mot de passe JDBC.
+
+==== jdbcCatalog
+* expression: `jdbc.catalog`
+* description: Catalogue JDBC.
+
+==== jdbcSchema
+* expression: `jdbc.schema`
+* description: Schéma JDBC.
+
+==== jdbcOracleRetrieveRemarks
+* expression: `jdbc.oracleRetrieveRemarks`
+* valeur par défaut: `false`
+* description: Récupérer les remarques Oracle ? Cela impacte la vitesse du reverse engineering.
+
+==== jdbcOracleRetrieveSynonyms
+* expression: `jdbc.oracleRetrieveSynonyms`
+* valeur par défaut: `true`
+* description: Récupérer les synonymes ?
+
+==== jdbc.reverseIndexes
+* expression: `jdbc.reverseIndexes`
+* valeur par défaut: `true`
+* description: Quand `false`, désactive complètement le reverse des index. Utile pour les grandes bases de données.
+
+==== jdbc.reverseOnlyUniqueIndexes
+* expression: `jdbc.reverseOnlyUniqueIndexes`
+* valeur par défaut: `true`
+* description: Quand `true`, ne reverse que les index uniques.
+
+==== jdbcReverseViews
+* expression: `jdbc.reverseViews`
+* valeur par défaut: `false`
+* description: Doit-on reverser aussi les VIEWS ?
+
+==== targetFilename
+* expression: `maven-metadata-plugin.targetFilename`
+* valeur par défaut: `${basedir}/src/main/config/celerio-maven-plugin/metadata.xml`
+* description: Chemin complet du fichier XML créé par ce plugin.
+
+==== jdbcTableNamePatterns
+* type: List
+* valeur par défaut: `%`
+* description: Pour filtrer les tables durant le reverse. Par défaut Celerio inverse toutes les tables (`%`).
+
+[[extraction-simple-usage]]
+== Utilisation simple
+
+Dans votre `pom.xml`, déclarez en _properties_ les _expressions_ nécessaires au plugin pour se connecter à votre base de données. Puis créez un profil dédié pour exécuter le plugin.
+
+[source,xml]
+----
+<properties>
+  <jdbc.groupId>com.h2database</jdbc.groupId>
+  <jdbc.artifactId>h2</jdbc.artifactId>
+  <jdbc.version>2.3.232</jdbc.version>
+  <jdbc.driver>org.h2.Driver</jdbc.driver>
+  <jdbc.url>jdbc:h2:${project.build.directory}/db/mydbname</jdbc.url>
+  <jdbc.user>root</jdbc.user>
+  <jdbc.password>manager</jdbc.password>
+</properties>
+
+<!-- ... -->
+
+<profile>
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <!-- Extract the database metadata -->
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <id>metadata</id>
+  <build>
+    <defaultGoal>generate-sources</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>com.jaxio.celerio</groupId>
+        <artifactId>dbmetadata-maven-plugin</artifactId>
+        <version>${celerio-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>Extract the database schema.</id>
+            <goals>
+              <goal>extract-metadata</goal>
+            </goals>
+            <configuration>
+              <jdbcTableNamePatterns>
+                <param>%</param>
+              </jdbcTableNamePatterns>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>${jdbc.groupId}</groupId>
+            <artifactId>${jdbc.artifactId}</artifactId>
+            <version>${jdbc.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</profile>
+----
+
+Lancez l'extraction :
+
+[source,bash]
+----
+export JAVA_HOME=/home/herve/jdk-25.0.2+10
+mvn -Pmetadata generate-sources
+----

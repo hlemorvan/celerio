@@ -1,0 +1,273 @@
+[[configuration]]
+= 11. Configuration Celerio
+
+Un exemple de fichier de configuration complet est fourni lorsque vous créez un projet à partir de la base de données H2 exemple. Le fichier se trouve sous `quickstart-conf/celerio-maven-plugin.xml`.
+
+Ce fichier de configuration vous permet de surcharger les conventions et de contrôler plus précisément ce qui est généré. Par exemple, vous pouvez renommer des variables, rendre des associations bidirectionnelles, changer un type, etc.
+
+Voici les principaux points de configuration :
+
+* <<xsd-inline-doc>>
+* <<entity-id>>
+** <<sequence-per-table>>
+** <<custom-id-generator>>
+* <<entity-property-names>>
+** <<underscore-camel-case>>
+** <<native-camel-case>>
+** <<force-entity-name>>
+** <<force-property-name>>
+* <<type-mapping>>
+** <<force-type-locally>>
+** <<number-mapping>>
+** <<date-mapping>>
+* <<enum-mapping>>
+** <<enum-string>>
+** <<enum-integer>>
+* <<associations>>
+** <<many-to-one>>
+** <<one-to-many>>
+** <<one-to-one>>
+** <<many-to-many>>
+* <<inheritance>>
+** <<single-table>>
+** <<joined-strategy>>
+** <<table-per-class>>
+
+[[xsd-inline-doc]]
+== Documentation inline via XSD
+
+Avant d'éditer votre fichier de configuration, assurez-vous que votre IDE affiche la documentation présente dans le fichier `celerio.xsd` et suggère les tags disponibles. Sous IntelliJ IDEA ou Eclipse, configurez la validation XML pour pointer vers le fichier XSD.
+
+image::images/celerio-eclipse-xsd-completion.png[Complétion et documentation sous Eclipse]
+
+[[entity-id]]
+== ID d'entité
+
+Si vous suivez les conventions, vous n'avez pas besoin de configurer quoi que ce soit concernant les IDs. Ces exemples sont pour une utilisation avancée.
+
+[[sequence-per-table]]
+=== Utiliser une SEQUENCE par TABLE
+
+Dans le cas où vous utilisez une séquence par table pour générer vos valeurs de clé primaire, vous devez configurer Celerio en conséquence :
+
+[source,xml]
+----
+<entityConfigs>
+  <entityConfig tableName="ADDRESS" sequenceName="ADDRESS_SEQ"/>
+</entityConfigs>
+----
+
+En supposant que la PK de la table `ADDRESS` est mappée vers un `Integer`, le code généré ressemblerait à :
+
+[source,java]
+----
+@Column(name = "ADDRESS_ID", nullable = false, unique = true, precision = 5)
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ADDRESS_SEQ")
+@SequenceGenerator(name = "ADDRESS_SEQ", sequenceName = "ADDRESS_SEQ")
+@Id
+private Integer id;
+----
+
+[[custom-id-generator]]
+=== Utiliser un générateur d'ID personnalisé
+
+Vous pouvez aussi spécifier un générateur d'ID personnalisé :
+
+[source,xml]
+----
+<entityConfig tableName="ACCOUNT">
+  <columnConfigs>
+    <columnConfig columnName="ACCOUNT_ID" generatorClass="com.example.MyIdGenerator"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[entity-property-names]]
+== Noms d'entités et de propriétés
+
+[[underscore-camel-case]]
+=== Le trait de soulignement `_` active la syntaxe Java camelCase
+
+Les noms de tables et colonnes SQL utilisent souvent le trait de soulignement comme séparateur de mots. Celerio convertit automatiquement ces noms en camelCase Java.
+
+Exemple : `first_name` → `firstName`, `ACCOUNT_ID` → `accountId`
+
+[[native-camel-case]]
+=== Support natif du camelCase
+
+Si votre base de données utilise déjà le camelCase pour les noms de tables/colonnes, Celerio le respecte également.
+
+[[force-entity-name]]
+=== Forcer le nom d'une entité
+
+[source,xml]
+----
+<entityConfig tableName="T_ACCOUNT" entityName="Account"/>
+----
+
+[[force-property-name]]
+=== Forcer le nom d'une propriété
+
+[source,xml]
+----
+<entityConfig tableName="ACCOUNT">
+  <columnConfigs>
+    <columnConfig columnName="ACC_LOGIN" fieldName="login"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[type-mapping]]
+== Mapping de types
+
+[[force-type-locally]]
+=== Forcer un mapping de type localement
+
+[source,xml]
+----
+<entityConfig tableName="ACCOUNT">
+  <columnConfigs>
+    <columnConfig columnName="AMOUNT" mappedType="M_BIGDECIMAL"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[number-mapping]]
+=== Personnalisation du mapping de nombres
+
+[source,xml]
+----
+<entityConfig tableName="PRODUCT">
+  <columnConfigs>
+    <columnConfig columnName="PRICE" mappedType="M_BIGDECIMAL"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[date-mapping]]
+=== Personnalisation du mapping des dates
+
+[source,xml]
+----
+<entityConfig tableName="EVENT">
+  <columnConfigs>
+    <columnConfig columnName="EVENT_DATE" temporalType="DATE"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[enum-mapping]]
+== Mapping d'enum
+
+[[enum-string]]
+=== Enum persisté en String
+
+[source,xml]
+----
+<sharedEnumConfigs>
+  <sharedEnumConfig name="Civility">
+    <enumValues>
+      <enumValue value="MR" label="Monsieur"/>
+      <enumValue value="MRS" label="Madame"/>
+    </enumValues>
+  </sharedEnumConfig>
+</sharedEnumConfigs>
+
+<entityConfigs>
+  <entityConfig tableName="ACCOUNT">
+    <columnConfigs>
+      <columnConfig columnName="CIVILITY" sharedEnumName="Civility"/>
+    </columnConfigs>
+  </entityConfig>
+</entityConfigs>
+----
+
+[[enum-integer]]
+=== Enum persisté en Integer
+
+Pour un enum persisté en tant qu'entier, ajoutez `asOrdinal="true"` dans le `columnConfig` :
+
+[source,xml]
+----
+<columnConfig columnName="STATUS" sharedEnumName="Status" asOrdinal="true"/>
+----
+
+[[associations]]
+== Associations
+
+[[many-to-one]]
+=== @ManyToOne
+
+Celerio génère automatiquement les associations `@ManyToOne` à partir des clés étrangères. Pour personnaliser :
+
+[source,xml]
+----
+<entityConfig tableName="BOOK">
+  <columnConfigs>
+    <columnConfig columnName="AUTHOR_ID" manyToOneConfig="..."/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[one-to-many]]
+=== @OneToMany
+
+Le côté `@OneToMany` inverse est automatiquement généré. Pour rendre une association bidirectionnelle ou la personnaliser, utilisez le `columnConfig` côté `@ManyToOne`.
+
+[[one-to-one]]
+=== @OneToOne
+
+Pour les relations one-to-one :
+
+[source,xml]
+----
+<entityConfig tableName="PASSPORT">
+  <columnConfigs>
+    <columnConfig columnName="HOLDER_ID" oneToOneConfig="..."/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[many-to-many]]
+=== @ManyToMany
+
+Celerio génère automatiquement les associations `@ManyToMany` à partir des tables de jointure (tables avec exactement 2 clés étrangères formant une clé primaire composite).
+
+[[inheritance]]
+== Héritage
+
+[[single-table]]
+=== Stratégie Single Table
+
+[source,xml]
+----
+<entityConfig tableName="VEHICLE" inheritance="SINGLE_TABLE">
+  <columnConfigs>
+    <columnConfig columnName="VEHICLE_TYPE" discriminatorColumn="true"
+                  discriminatorType="STRING"/>
+  </columnConfigs>
+</entityConfig>
+
+<entityConfig tableName="CAR" parentEntityTableName="VEHICLE"
+              discriminatorValue="CAR"/>
+<entityConfig tableName="TRUCK" parentEntityTableName="VEHICLE"
+              discriminatorValue="TRUCK"/>
+----
+
+[[joined-strategy]]
+=== Stratégie Joined
+
+[source,xml]
+----
+<entityConfig tableName="VEHICLE" inheritance="JOINED"/>
+<entityConfig tableName="CAR" parentEntityTableName="VEHICLE"/>
+----
+
+[[table-per-class]]
+=== Stratégie Table Per Class
+
+[source,xml]
+----
+<entityConfig tableName="VEHICLE" inheritance="TABLE_PER_CLASS"/>
+<entityConfig tableName="CAR" parentEntityTableName="VEHICLE"/>
+----

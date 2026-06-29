@@ -1,0 +1,204 @@
+[[code-modification]]
+= 8. Modification du code, régénération et collisions
+
+* <<modification-detection>>
+* <<java-files>>
+** <<moving-to-src-main-java>>
+** <<code-modification-base-inheritance>>
+* <<non-java-files-same-dir>>
+** <<take-ownership>>
+* <<non-java-files-different-dir>>
+* <<collisions-merging>>
+** <<collision-folder>>
+** <<merging-manually>>
+
+[[modification-detection]]
+== Détection des modifications manuelles
+
+L'une des fonctionnalités les plus importantes d'un générateur de code est sa capacité à préserver les modifications manuelles lors des régénérations. Celerio propose diverses solutions pragmatiques selon la nature du fichier généré.
+
+Celerio garde une trace de tous les fichiers qu'il génère dans `.celerio/generated.xml`. Ne committez pas ce fichier dans votre SCM — il est différent pour chaque développeur.
+
+À chaque régénération d'un fichier, Celerio vérifie d'abord si le fichier a été modifié depuis la dernière génération :
+
+* _Si oui_ : Celerio ne prend aucun risque, il génère le fichier dans le dossier de collision (détails ci-dessous).
+* _Si non_ : Celerio remplace le fichier par le nouveau contenu généré.
+
+Si le fichier généré aurait le même contenu que l'ancien, Celerio ne le régénère pas afin de préserver l'horodatage du fichier.
+
+IMPORTANT: Si vous supprimez le fichier `.celerio/generated.xml`, Celerio n'a aucun moyen de déterminer si un fichier a été modifié manuellement ou non, et vous risquez de perdre vos modifications.
+
+[[java-files]]
+== Fichiers Java
+
+Par défaut, Celerio génère les fichiers Java sous `src/main/generated-java` ou `src/main/java` selon la configuration de `outputDir` (voir <<code-generation>>).
+
+Dans cette section, vous apprendrez à modifier un fichier Java généré sans perdre vos modifications. La première approche consiste simplement à déplacer le fichier vers `${baseDir}/src/main/java`. La seconde approche utilise l'héritage d'une classe Base.
+
+IMPORTANT: Dans tous les cas, évitez de modifier directement le fichier Java généré car vous risquez de perdre vos changements dès la prochaine régénération.
+
+[[moving-to-src-main-java]]
+=== Déplacer le fichier vers ${baseDir}/src/main/java
+
+Avant de modifier un fichier Java généré, déplacez-le vers le dossier `${baseDir}/src/main/java`. Par exemple, pour éditer `BankAccount.java` :
+
+* _Si outputDir == baseDir_ : déplacez de `src/main/generated-java/<package>/BankAccount.java` vers `src/main/java/<package>/BankAccount.java`
+* _Si outputDir != baseDir_ : déplacez de `${outputDir}/src/main/java/<package>/BankAccount.java` vers `${baseDir}/src/main/java/<package>/BankAccount.java`
+
+NOTE: Lors du déplacement, conservez le même chemin relatif.
+
+Puisque tous les fichiers sous `${baseDir}/src/main/java` sont considérés comme des fichiers « utilisateur », Celerio ne les touchera plus.
+
+**Avantage** : vous pouvez faire ce que vous voulez avec le fichier, notamment modifier n'importe quel corps de méthode.
+
+**Inconvénient** : si votre schéma de base de données change, vous devrez peut-être refléter ces changements manuellement dans ce fichier. Heureusement, Celerio génère le fichier dans un dossier de collision dédié pour vous aider dans cette tâche.
+
+[[code-modification-base-inheritance]]
+=== Modifications via héritage Base
+
+Celerio vous permet d'étendre une classe Java générée sans modifier le code généré.
+
+Prenons l'exemple de l'entité `Account` générée :
+
+[source,java]
+----
+package com.example.demo.domain;
+
+@Entity
+@Table(name = "ACCOUNT")
+public class Account implements Serializable {
+    private String firstName;
+    private String lastName;
+    // ...
+}
+----
+
+Supposons que vous vouliez ajouter une méthode pour obtenir le nom complet. Au lieu de modifier le fichier généré, créez un nouveau fichier `Account.java` dans `${baseDir}/src/main/java/com/example/demo/domain` :
+
+[source,java]
+----
+package com.example.demo.domain;
+
+@Entity
+@Table(name = "ACCOUNT")
+public class Account extends AccountBase implements Serializable {
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
+}
+----
+
+Cette classe `Account` étend maintenant une classe qui n'existe pas encore !
+
+La prochaine fois que vous lancez Celerio, il détecte votre nouveau fichier `Account.java` et détecte que la classe `Account` étend une classe avec le même nom plus le suffixe `Base`. Celerio assume alors que vous voulez « impersonifier » la classe et génère le code dans une classe appelée `AccountBase` :
+
+[source,java]
+----
+@MappedSuperclass
+/* Copy paste these annotations as is in your subclass
+@Entity
+@Table(name = "ACCOUNT")
+*/
+public abstract class AccountBase implements Serializable {
+    // ...
+}
+----
+
+NOTE: Vérifiez toujours le code source de la classe 'Base' — vous pouvez y trouver des instructions relatives à des annotations à ajouter dans votre sous-classe.
+
+[[non-java-files-same-dir]]
+== Autres fichiers (non-Java) — baseDir == outputDir
+
+=== Prendre possession d'un fichier généré
+
+[[take-ownership]]
+La façon la plus simple d'indiquer à Celerio de ne pas écraser un fichier généré est de modifier ce fichier ou de changer sa date de modification avec la commande `touch` (Unix).
+
+La prochaine fois que Celerio s'exécute, il détecte que votre fichier a été modifié et ne l'écrase pas.
+
+Si vous changez d'avis et voulez que Celerio régénère le fichier, supprimez-le simplement et régénérez votre code.
+
+=== Résumé des règles de génération (baseDir == outputDir)
+
+[cols="1,1,1,2", options="header"]
+|===
+|Fichier déjà présent
+|Fichier modifié manuellement
+|Fichier généré identique
+|Action Celerio
+
+|Non
+|n/a
+|n/a
+|Fichier généré
+
+|Oui
+|Oui
+|Non
+|Fichier généré dans le dossier de collision
+
+|Oui
+|Non
+|Non
+|Fichier écrasé
+
+|Oui
+|Oui
+|Oui
+|Fichier non généré
+
+|Oui
+|Non
+|Oui
+|Fichier non généré
+|===
+
+[[non-java-files-different-dir]]
+== Autres fichiers (non-Java) — baseDir != outputDir
+
+Dans ce cas, tout est plus simple : tous les fichiers sous `${baseDir}` ne peuvent par définition pas être écrasés par Celerio.
+
+Si vous voulez prendre possession d'un fichier, déplacez-le simplement de `${outputDir}` vers `${baseDir}` en préservant le chemin relatif.
+
+=== Résumé des règles de génération (baseDir != outputDir)
+
+[cols="1,1,2", options="header"]
+|===
+|Fichier présent sous baseDir
+|Fichier généré identique
+|Action Celerio
+
+|Non
+|n/a
+|Fichier généré sous outputDir
+
+|Oui
+|Non
+|Fichier généré dans le dossier de collision
+
+|Oui
+|Oui
+|Fichier non généré
+|===
+
+[[collisions-merging]]
+== Collisions et fusion
+
+[[collision-folder]]
+=== Dossier de collision
+
+Quand Celerio détecte qu'un fichier à régénérer a été modifié manuellement, il ne l'écrase pas. À la place, Celerio génère le fichier dans le _dossier de collision_ : `target/celerio-maven-plugin/collisions`
+
+Tous les fichiers générés dans ce dossier ont le même chemin relatif que s'ils avaient été générés normalement.
+
+[[merging-manually]]
+=== Fusion manuelle des fichiers
+
+Pour fusionner les fichiers en conflit, vous pouvez utiliser un outil tel que :
+
+* link:http://winmerge.org/[WinMerge] (Windows)
+* link:http://www.araxis.com/merge/[Araxis Merge] (Windows/Mac)
+* `meld` (Linux)
+* `vimdiff` / `git diff` (en ligne de commande)
+
+Comme les fichiers en conflit se trouvent dans le dossier de collision avec le même chemin relatif, vous pouvez utiliser la fonctionnalité de comparaison récursive de répertoires de votre outil de fusion. Spécifiez simplement votre répertoire racine de projet et le répertoire de collision, puis gardez une trace des modifications que vous avez faites et fusionnez éventuellement du nouveau code généré dans votre fichier existant.

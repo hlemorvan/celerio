@@ -1,0 +1,50 @@
+= Guide de référence Celerio
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectanchors:
+:sectlinks:
+:source-highlighter: rouge
+:icons: font
+:version: 4.0.24-SNAPSHOT
+:java-version: 25
+:spring-boot-version: 4.0.1
+:angular-version: 18
+
+**Version actuelle : {version}** +
+Java {java-version} • Spring Boot {spring-boot-version} • Angular {angular-version} • Velocity 2.4
+
+Celerio est un générateur de code pour applications orientées données. +
+Celerio est distribué sous licence link:https://www.apache.org/licenses/LICENSE-2.0[Apache License V2.0].
+
+---
+
+include::01-introduction.adoc[]
+
+include::02-installation.adoc[]
+
+include::03-bootstrap-sample.adoc[]
+
+include::04-bootstrap-real.adoc[]
+
+include::05-database-extraction.adoc[]
+
+include::06-code-generation.adoc[]
+
+include::07-delete-generated-files.adoc[]
+
+include::08-code-modification.adoc[]
+
+include::09-conventions.adoc[]
+
+include::10-configuration-file.adoc[]
+
+include::11-configuration.adoc[]
+
+include::12-writing-templates.adoc[]
+
+include::13-troubleshooting.adoc[]
+
+include::14-miscellaneous.adoc[]
+
+include::15-migration-guide.adoc[]
