@@ -19,18 +19,22 @@ package com.jaxio.celerio.configuration.convention;
 import lombok.Setter;
 
 import java.util.regex.Pattern;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * By default Celerio calculates Java field name based on the underlying column name. <br>
  * This setting allows you to change the column name that is passed to Celerio to calculate the default field name. <br>
  * You can for example remove well known prefix pattern from your column names.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Renamer {
 
     @Setter
+    @XmlAttribute
     private String regexp;
 
     @Setter
+    @XmlAttribute
     private String replace;
 
     /*

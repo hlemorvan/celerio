@@ -38,10 +38,10 @@ import com.jaxio.celerio.util.Named;
 import com.jaxio.celerio.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -62,7 +62,7 @@ import static com.jaxio.celerio.model.support.SuffixPrefixPredicates.IS_LABEL;
 import static com.jaxio.celerio.util.FallBackUtil.fallBack;
 import static com.jaxio.celerio.util.MiscUtil.toReadableLabel;
 import static com.jaxio.celerio.util.StringUtil.orderToString;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 /**

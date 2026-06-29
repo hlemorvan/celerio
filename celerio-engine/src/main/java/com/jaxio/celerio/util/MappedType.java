@@ -19,7 +19,7 @@ package com.jaxio.celerio.util;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 
 public enum MappedType {
     // NOTE: fullType of byte[] is useless in theory but for consistency and to avoid generation errors we need

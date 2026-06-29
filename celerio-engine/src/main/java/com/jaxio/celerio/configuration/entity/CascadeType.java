@@ -61,20 +61,20 @@ public enum CascadeType {
         return this != NONE;
     }
 
-    public javax.persistence.CascadeType asJpaType() {
+    public jakarta.persistence.CascadeType asJpaType() {
         switch (this) {
             case ALL:
-                return javax.persistence.CascadeType.ALL;
+                return jakarta.persistence.CascadeType.ALL;
             case PERSIST:
-                return javax.persistence.CascadeType.PERSIST;
+                return jakarta.persistence.CascadeType.PERSIST;
             case MERGE:
-                return javax.persistence.CascadeType.MERGE;
+                return jakarta.persistence.CascadeType.MERGE;
             case REMOVE:
-                return javax.persistence.CascadeType.REMOVE;
+                return jakarta.persistence.CascadeType.REMOVE;
             case REFRESH:
-                return javax.persistence.CascadeType.REFRESH;
+                return jakarta.persistence.CascadeType.REFRESH;
             case DETACH:
-                return javax.persistence.CascadeType.DETACH;
+                return jakarta.persistence.CascadeType.DETACH;
             default:
                 throw new IllegalStateException("There is no JPA equivalent");
         }

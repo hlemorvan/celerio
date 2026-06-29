@@ -29,7 +29,7 @@ import com.jaxio.celerio.template.pack.ClasspathTemplatePackInfoLoader;
 import com.jaxio.celerio.template.pack.TemplatePackInfo;
 import com.jaxio.celerio.util.XsdHelper;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -49,8 +49,8 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.util.PackageUtil.isPackageNameValid;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 /**
  * This plugin creates a default project folder layout following Maven conventions.

@@ -17,12 +17,15 @@
 package com.jaxio.celerio.configuration;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Include a configuration file dedicated to entityConfigs. Use it on large project to split your entityConfigs configuration into smaller pieces.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Include {
     @Setter
+    @XmlAttribute
     private String filename;
 
     /*

@@ -33,7 +33,7 @@ public class NoPrimaryKey implements PrimaryKey {
     private final List<Attribute> attributes = unmodifiableList(new ArrayList<Attribute>());
 
     public NoPrimaryKey(Entity entity) {
-        Assert.notNull(entity);
+        Assert.notNull(entity, "");
         this.entity = entity;
     }
 

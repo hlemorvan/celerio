@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Slf4j

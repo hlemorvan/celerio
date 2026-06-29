@@ -22,8 +22,8 @@ import org.springframework.util.Assert;
 
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
 import static com.jaxio.celerio.util.PackageUtil.assemblePackage;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 
 /**
@@ -38,7 +38,7 @@ public class ClassNamer2 extends AbstractNamer {
     private String packageName;
 
     public ClassNamer2(Entity entity, String rootPackage, String subPackage, String prefix, String suffix) {
-        Assert.notNull(entity);
+        Assert.notNull(entity, "");
         prefix = isBlank(prefix) ? "" : prefix;
         suffix = isBlank(suffix) ? "" : suffix;
         this.type = buildType(prefix, entity.getName(), suffix);

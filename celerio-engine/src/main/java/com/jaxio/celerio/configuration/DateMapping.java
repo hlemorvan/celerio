@@ -19,14 +19,19 @@ package com.jaxio.celerio.configuration;
 import com.jaxio.celerio.configuration.database.JdbcType;
 import com.jaxio.celerio.util.MappedType;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Global rule to map columns whose JDBC TYPE is DATE, TIME or TIMESTAMP to a Java type.
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DateMapping {
+    @XmlAttribute
     private MappedType mappedType;
+    @XmlAttribute
     private JdbcType columnJdbcType;
+    @XmlAttribute
     private String columnNameRegExp;
 
     /*

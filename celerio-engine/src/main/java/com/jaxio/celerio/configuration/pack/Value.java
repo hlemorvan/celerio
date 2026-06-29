@@ -17,8 +17,11 @@
 package com.jaxio.celerio.configuration.pack;
 
 import lombok.Data;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Value {
+    @XmlAttribute
     private String value;
 }

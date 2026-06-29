@@ -62,7 +62,7 @@ public class JpaManyToManyRelation implements RelationSpi, PackageImportAdder {
     }
 
     private String getManyToManyAnnotation() {
-        addImport("javax.persistence.ManyToMany");
+        addImport("jakarta.persistence.ManyToMany");
         AttributeBuilder ab = new AttributeBuilder();
 
         if (relation.isInverse()) {
@@ -95,7 +95,7 @@ public class JpaManyToManyRelation implements RelationSpi, PackageImportAdder {
         if (relation.isInverse()) {
             return null;
         }
-        addImport("javax.persistence.JoinTable");
+        addImport("jakarta.persistence.JoinTable");
         String fromJoinColumn = getJoinColumn(relation.getMiddleToLeft());
         String toJoinColumn = getJoinColumn(relation.getMiddleToRight());
         return "@JoinTable(name = \"" + relation.getMiddleEntity().getTableNameEscaped() + "\", joinColumns = " + fromJoinColumn + ", inverseJoinColumns = "
@@ -113,7 +113,7 @@ public class JpaManyToManyRelation implements RelationSpi, PackageImportAdder {
         } else {
             throw new IllegalStateException("What is this relation ?");
         }
-        addImport("javax.persistence.JoinColumn");
+        addImport("jakarta.persistence.JoinColumn");
         return "@JoinColumn(name = \"" + builder.getAttributes() + "\")";
     }
 

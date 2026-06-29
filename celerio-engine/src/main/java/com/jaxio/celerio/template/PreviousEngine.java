@@ -27,7 +27,7 @@ import com.jaxio.celerio.template.pack.TemplatePack;
 import com.jaxio.celerio.util.IOUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -38,9 +38,8 @@ import java.util.Map;
 import static java.io.File.separatorChar;
 import static java.util.regex.Pattern.*;
 import static org.apache.commons.io.FilenameUtils.normalize;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
-import static org.apache.velocity.util.StringUtils.normalizePath;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 // -----------
 // IMPLEMENTATION NOTE: 
@@ -195,7 +194,7 @@ public class PreviousEngine {
                 // Such move cases are not handled in the contentWriter.processFile and must be therefore handled here
                 // NOTE: do not try to optimize this if/else check, it would be error prone and not understandable (thanks :-))
                 boolean moveOldGeneratedFile = false;
-                boolean sameSubPath = normalizePath(userDomainPath).equals(normalizePath(generatedDomainPath));
+                boolean sameSubPath = normalize(userDomainPath).equals(normalize(generatedDomainPath));
 
                 if (ImportsContext.isExtendedByUser()) {
                     // We generate XBase.java, existing file could be X.java

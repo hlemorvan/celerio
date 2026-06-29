@@ -19,18 +19,24 @@ package com.jaxio.celerio.configuration.convention;
 import com.jaxio.celerio.convention.ClassType;
 import com.jaxio.celerio.convention.GeneratedPackage;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Override the class conventions such as GeneratedPackage, suffix and prefixes
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ClassTypeOverride {
     @Setter
+    @XmlAttribute
     private ClassType classType;
     @Setter
+    @XmlAttribute
     private String prefix;
     @Setter
+    @XmlAttribute
     private String suffix;
     @Setter
+    @XmlAttribute
     private GeneratedPackage generatedPackage;
 
     /*

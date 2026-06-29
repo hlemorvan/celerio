@@ -18,7 +18,7 @@ package com.jaxio.celerio.support;
 
 import com.jaxio.celerio.aspects.ForbiddenWhenBuilding;
 import com.jaxio.celerio.util.StringUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 

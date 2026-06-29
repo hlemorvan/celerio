@@ -40,13 +40,13 @@ public enum FetchType {
         return this == EAGER;
     }
 
-    public javax.persistence.FetchType asJpaType() {
+    public jakarta.persistence.FetchType asJpaType() {
         if (this == LAZY) {
-            return javax.persistence.FetchType.LAZY;
+            return jakarta.persistence.FetchType.LAZY;
         }
 
         if (this == EAGER) {
-            return javax.persistence.FetchType.EAGER;
+            return jakarta.persistence.FetchType.EAGER;
         }
 
         throw new IllegalStateException("There is no JPA equivalent");

@@ -21,22 +21,30 @@ import lombok.Setter;
 import org.springframework.util.AntPathMatcher;
 
 import static com.jaxio.celerio.util.StringUtil.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * A pattern is a structure to help handling inclusion and exclusion of resources
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SequencePattern {
     @Setter
+    @XmlAttribute
     private String tableNamePattern;
     @Setter
+    @XmlAttribute
     private String sequenceName;
     @Setter
+    @XmlAttribute
     private String catalog;
     @Setter
+    @XmlAttribute
     private String schema;
     @Setter
+    @XmlAttribute
     private Integer initialValue;
     @Setter
+    @XmlAttribute
     private Integer allocationSize;
     private transient AntPathMatcher antPathMatcher = new AntPathMatcher();
 

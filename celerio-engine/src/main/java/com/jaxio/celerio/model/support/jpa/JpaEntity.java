@@ -35,9 +35,9 @@ import java.util.Set;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.jaxio.celerio.configuration.database.support.SqlUtil.escapeSql;
-import static javax.persistence.InheritanceType.JOINED;
-import static javax.persistence.InheritanceType.SINGLE_TABLE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static jakarta.persistence.InheritanceType.JOINED;
+import static jakarta.persistence.InheritanceType.SINGLE_TABLE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Helper to write non trivial JPA annotations that may be applied to the generated entity class.
@@ -79,7 +79,7 @@ public class JpaEntity extends AbstractEntitySpi {
         for (Attribute attribute : entity.getAttributes().getList()) {
             for (Attribute upAttribute : entity.getAttributes().getFlatAbove().getList()) {
                 if (attribute.getColumnName().equalsIgnoreCase(upAttribute.getColumnName())) {
-                    addImport("javax.persistence.AttributeOverride");
+                    addImport("jakarta.persistence.AttributeOverride");
                     String attributeOverride = "@AttributeOverride(name = \"" + attribute.getVar() + "\", column = @Column(name=\""
                             + attribute.getColumnNameEscaped() + "\"))";
                     attributesOverrides.add(attributeOverride);
@@ -92,7 +92,7 @@ public class JpaEntity extends AbstractEntitySpi {
         } else if (attributesOverrides.size() == 1) {
             return appendComment(attributesOverrides.iterator().next());
         } else {
-            addImport("javax.persistence.AttributeOverrides");
+            addImport("jakarta.persistence.AttributeOverrides");
             return appendComment("@AttributeOverrides({" + attributeBuilder.getAttributes() + "})");
         }
     }
@@ -125,7 +125,7 @@ public class JpaEntity extends AbstractEntitySpi {
         } else if (secondaryTables.size() == 1) {
             return appendComment(getSecondaryTableAnnotation(secondaryTables.iterator().next()));
         } else {
-            addImport("javax.persistence.SecondaryTables");
+            addImport("jakarta.persistence.SecondaryTables");
             StringBuilder sb = new StringBuilder("@SecondaryTables({");
             boolean first = true;
             for (Table secondaryTable : secondaryTables) {
@@ -145,7 +145,7 @@ public class JpaEntity extends AbstractEntitySpi {
         if (!(entity.hasInheritance() && entity.getInheritance().hasDiscriminatorValue() && entity.is(SINGLE_TABLE))) {
             return "";
         }
-        addImport("javax.persistence.DiscriminatorValue");
+        addImport("jakarta.persistence.DiscriminatorValue");
         return appendComment("@DiscriminatorValue(\"" + entity.getInheritance().getDiscriminatorValue() + "\")");
     }
 
@@ -154,11 +154,11 @@ public class JpaEntity extends AbstractEntitySpi {
             return "";
         }
 
-        addImport("javax.persistence.Inheritance");
+        addImport("jakarta.persistence.Inheritance");
         if (entity.is(SINGLE_TABLE)) {
             return appendComment("@Inheritance");
         } else {
-            addImport("javax.persistence.InheritanceType");
+            addImport("jakarta.persistence.InheritanceType");
             return appendComment("@Inheritance(strategy = InheritanceType." + entity.getInheritance().getStrategy() + ")");
         }
     }
@@ -169,7 +169,7 @@ public class JpaEntity extends AbstractEntitySpi {
         }
 
         if (entity.getInheritance().hasDiscriminatorColumn()) {
-            addImport("javax.persistence.DiscriminatorColumn");
+            addImport("jakarta.persistence.DiscriminatorColumn");
             return appendComment("@DiscriminatorColumn(name = \"" + entity.getInheritance().getDiscriminatorColumn() + "\")");
         }
 
@@ -209,7 +209,7 @@ public class JpaEntity extends AbstractEntitySpi {
         String pkColumnName = table.getPrimaryKeys().iterator().next();
         String secondaryPkColumnName = secondaryTable.getPrimaryKeys().iterator().next();
 
-        addImport("javax.persistence.SecondaryTable");
+        addImport("jakarta.persistence.SecondaryTable");
         if (pkColumnName.equalsIgnoreCase(secondaryPkColumnName)) {
             return "@SecondaryTable(name = \"" + secondaryTable.getNameEscaped() + "\")";
         } else {
@@ -219,7 +219,7 @@ public class JpaEntity extends AbstractEntitySpi {
     }
 
     private String getPrimaryKeyJoinColumnAnnotation(String pkColumnName) {
-        addImport("javax.persistence.PrimaryKeyJoinColumn");
+        addImport("jakarta.persistence.PrimaryKeyJoinColumn");
         return "@PrimaryKeyJoinColumn(name = \"" + escapeSql(pkColumnName) + "\")";
     }
 
@@ -248,7 +248,7 @@ public class JpaEntity extends AbstractEntitySpi {
     }
 
     public String getEntityAnnotation() {
-        addImport("javax.persistence.Entity");
+        addImport("jakarta.persistence.Entity");
         return appendComment("@Entity");
     }
 
@@ -259,7 +259,7 @@ public class JpaEntity extends AbstractEntitySpi {
             appendAttribute(annotation, getSchema());
             appendAttribute(annotation, getName());
             appendAttribute(annotation, getUniqueConstraints());
-            addImport("javax.persistence.Table");
+            addImport("jakarta.persistence.Table");
             return appendComment("@Table(" + annotation + ")");
         }
         return "";
@@ -315,7 +315,7 @@ public class JpaEntity extends AbstractEntitySpi {
     }
 
     private String buildConstraint(CompositeUnique compositeUnique) {
-        addImport("javax.persistence.UniqueConstraint");
+        addImport("jakarta.persistence.UniqueConstraint");
         String ret = "@UniqueConstraint(";
         if (isNotBlank(compositeUnique.getName())) {
             ret += "name=\"" + compositeUnique.getName() + "\", ";

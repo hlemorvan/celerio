@@ -17,17 +17,18 @@
 package com.jaxio.celerio.configuration.util;
 
 import com.jaxio.celerio.util.PackageUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.jaxio.celerio.util.PackageUtil.assemblePackage;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PackageUtilTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullPackage() {
-        assertThat(assemblePackage((String) null)).isNull();
+        assertThrows(IllegalArgumentException.class, () -> assemblePackage((String) null));
     }
 
     @Test
@@ -68,18 +69,18 @@ public class PackageUtilTest {
     @Test
     public void isPackagNameValid() {
         // valid package names
-        Assert.assertTrue(PackageUtil.isPackageNameValid("com"));
-        Assert.assertTrue(PackageUtil.isPackageNameValid("com.jaxio.celerio"));
-        Assert.assertTrue(PackageUtil.isPackageNameValid("com.jaxio2.celerio"));
-        Assert.assertTrue(PackageUtil.isPackageNameValid("_com.jaxio2.celerio"));
-        Assert.assertTrue(PackageUtil.isPackageNameValid("$com.jaxio2.celerio"));
+        Assertions.assertTrue(PackageUtil.isPackageNameValid("com"));
+        Assertions.assertTrue(PackageUtil.isPackageNameValid("com.jaxio.celerio"));
+        Assertions.assertTrue(PackageUtil.isPackageNameValid("com.jaxio2.celerio"));
+        Assertions.assertTrue(PackageUtil.isPackageNameValid("_com.jaxio2.celerio"));
+        Assertions.assertTrue(PackageUtil.isPackageNameValid("$com.jaxio2.celerio"));
 
         // invalid package names
-        Assert.assertFalse(PackageUtil.isPackageNameValid(""));
-        Assert.assertFalse(PackageUtil.isPackageNameValid("com.2jaxio.celerio"));
-        Assert.assertFalse(PackageUtil.isPackageNameValid("com. jaxio.celerio"));
-        Assert.assertFalse(PackageUtil.isPackageNameValid("com.jaxio-celerio"));
-        Assert.assertFalse(PackageUtil.isPackageNameValid("java.lang"));
-        Assert.assertFalse(PackageUtil.isPackageNameValid("javax.lang"));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid(""));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid("com.2jaxio.celerio"));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid("com. jaxio.celerio"));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid("com.jaxio-celerio"));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid("java.lang"));
+        Assertions.assertFalse(PackageUtil.isPackageNameValid("javax.lang"));
     }
 }

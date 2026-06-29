@@ -24,41 +24,62 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class JdbcConnectivity {
     @Setter
+    @XmlAttribute
     private String driver;
     @Setter
+    @XmlAttribute
     private String driverGroupId;
     @Setter
+    @XmlAttribute
     private String driverArtifactId;
     @Setter
+    @XmlAttribute
     private String driverArtifactIdVersion;
     @Setter
+    @XmlAttribute
     private String hibernateDialect;
     @Setter
+    @XmlAttribute
     private String sqlDelimiter;
 
     @Setter
+    @XmlAttribute
     private String password;
     @Setter
+    @XmlAttribute
     private String url;
     @Setter
+    @XmlAttribute
     private String user;
     @Setter
+    @XmlAttribute
     private String schemaName;
     @Setter
+    @XmlElementWrapper(name = "tableNamePatterns")
+    @XmlElement(name = "tableNamePattern")
     private List<String> tableNamePatterns = newArrayList();
     @Setter
+    @XmlAttribute
     private boolean oracleRetrieveRemarks;
     @Setter
+    @XmlAttribute
     private boolean oracleRetrieveSynonyms;
     @Setter
+    @XmlAttribute
     private Boolean reverseIndexes = true;
     @Setter
+    @XmlAttribute
     private Boolean reverseOnlyUniqueIndexes = true;
     @Setter
+    @XmlAttribute
     private String catalog;
+    @XmlElementWrapper(name = "tableTypes")
+    @XmlElement(name = "tableType")
     private List<TableType> tableTypes = newArrayList();
 
     public JdbcConnectivity() {

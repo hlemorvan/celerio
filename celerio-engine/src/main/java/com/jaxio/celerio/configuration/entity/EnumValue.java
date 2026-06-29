@@ -28,13 +28,22 @@ import static org.springframework.util.StringUtils.hasLength;
 
 import static com.jaxio.celerio.util.FallBackUtil.fallBack;
 import static com.jaxio.celerio.util.MiscUtil.toReadableLabel;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EnumValue {
+    @XmlAttribute
     private String name;
+    @XmlAttribute
     private String value;
+    @XmlAttribute
     private String label;
+    @XmlElementWrapper(name = "comments")
+    @XmlElement(name = "comment")
     private List<String> comments = newArrayList();
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     private List<Label> labels;
 
     public EnumValue() {

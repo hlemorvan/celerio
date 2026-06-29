@@ -51,7 +51,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.persistence.InheritanceType;
+import jakarta.persistence.InheritanceType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ import static com.jaxio.celerio.model.support.UniquePredicates.SIMPLE_UNIQUE;
 import static com.jaxio.celerio.util.FallBackUtil.fallBack;
 import static com.jaxio.celerio.util.MiscUtil.toReadableLabel;
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 /**
@@ -265,7 +265,7 @@ public class Entity implements Hierarchical<Entity>, Named, Map<String, Object> 
 
     public void setEntityConfig(EntityConfig config) {
         Assert.isNull(this.entityConfig, "entityConfig can be set only once");
-        Assert.notNull(config);
+        Assert.notNull(config, "");
         this.entityConfig = config;
     }
 
@@ -793,7 +793,7 @@ public class Entity implements Hierarchical<Entity>, Named, Map<String, Object> 
     }
 
     public boolean is(InheritanceType strategy) {
-        Assert.notNull(strategy);
+        Assert.notNull(strategy, "");
         if (getInheritance() == null) {
             return false;
         }

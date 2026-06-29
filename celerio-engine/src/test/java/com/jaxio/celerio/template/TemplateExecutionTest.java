@@ -16,8 +16,8 @@
 
 package com.jaxio.celerio.template;
 
-import org.fest.assertions.Assertions;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TemplateExecutionTest {
 

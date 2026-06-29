@@ -29,22 +29,22 @@ import com.jaxio.celerio.configuration.support.MetadataLoader;
 import com.jaxio.celerio.convention.ClassType;
 import com.jaxio.celerio.convention.GeneratedPackage;
 import com.jaxio.celerio.convention.MethodConvention;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-@Ignore
+@Disabled
 @ContextConfiguration("classpath:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CelerioProducerTest {
 
     private static final String H2_SQL_SCRIPT = "classpath:/sql/minimal.sql";
@@ -67,17 +67,17 @@ public class CelerioProducerTest {
         // just to keep junit mouth shut.
     }
 
-    @Ignore
+    @Disabled
     public void minimal() throws Exception {
         produceFolder("src/test/resources/minimal");
     }
 
-    @Ignore
+    @Disabled
     public void joinColumn() throws Exception {
         produceFolder("src/test/resources/joincolumn");
     }
 
-    @Ignore
+    @Disabled
     public void xmlmetadata() throws Exception {
         produceFolder("src/test/resources/xmlmetadata");
     }
@@ -88,30 +88,30 @@ public class CelerioProducerTest {
         celerioProducer.produce(celerio, metadata);
     }
 
-    @Ignore
+    @Disabled
     public void produceTablePerSubclassStategy() throws Exception {
         Celerio celerio = celerioLoader.load("src/test/resources/vehicle/table-per-class-strategy.xml");
         Metadata metadata = getMetaDataFromH2Script("classpath:/vehicle/table-per-class-strategy.sql");
         celerioProducer.produce(celerio, metadata);
     }
 
-    @Ignore
+    @Disabled
     public void produceConflictsH2() throws Exception {
         celerioProducer.produce("conflits", getMetaDataFromH2Script(CONFLICTS_H2_SQL_SCRIPT));
     }
 
-    @Ignore
+    @Disabled
     public void produceH2() throws Exception {
         celerioProducer.produce("default", getMetaDataFromH2Script(H2_SQL_SCRIPT));
     }
 
-    @Ignore
+    @Disabled
     public void produceH2AndConventions() throws Exception {
         addConventionOverrides();
         celerioProducer.produce("conventions", getMetaDataFromH2Script(H2_SQL_SCRIPT));
     }
 
-    @Ignore
+    @Disabled
     public void produceH2AndEntityConfig() throws Exception {
         Metadata metadata = getMetaDataFromH2Script(H2_SQL_SCRIPT);
         EntityConfig entityConfig = new EntityConfig();
@@ -130,7 +130,7 @@ public class CelerioProducerTest {
         conventions.getMethodConventions().add(overrideHasMethod());
     }
 
-    @Ignore
+    @Disabled
     public void produce() throws Exception {
         celerioProducer.produce(loader.load("src/test/resources/xmlmetadata/broken.xml"));
     }

@@ -18,11 +18,14 @@ package com.jaxio.celerio.configuration.entity;
 
 import lombok.Data;
 import repackaged.org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Add Hibernate SafeHtml annotation on this field.
  */
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SafeHtml {
+    @XmlAttribute
     WhiteListType whitelistType;
 }

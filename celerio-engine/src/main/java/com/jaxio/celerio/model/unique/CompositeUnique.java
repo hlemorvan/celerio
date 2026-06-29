@@ -23,7 +23,7 @@ import lombok.Getter;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 @Getter
 public class CompositeUnique implements Unique {

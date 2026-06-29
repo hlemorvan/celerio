@@ -19,9 +19,14 @@ package com.jaxio.celerio.configuration.eclipse;
 import lombok.Data;
 
 import java.util.List;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlRootElement(name = "profiles")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Profiles {
+    @XmlAttribute
     private String version;
+    @XmlElement(name = "profile")
     private List<Profile> profiles;
 }

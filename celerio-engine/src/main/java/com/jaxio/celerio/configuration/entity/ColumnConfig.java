@@ -29,74 +29,134 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.configuration.database.support.SqlUtil.escapeSql;
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ColumnConfig {
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     protected List<Label> labels;
+    @XmlElementWrapper(name = "usages")
+    @XmlElement(name = "usage")
     protected List<String> usages = newArrayList();
+    @XmlElement
     protected EnumConfig enumConfig = new EnumConfig();
+    @XmlAttribute
     protected String sharedEnumName;
+    @XmlElement
     protected SafeHtml safeHtml;
+    @XmlElement
     protected GeneratedValue generatedValue;
+    @XmlElement
     protected GenericGenerator genericGenerator;
+    @XmlElement
     protected IndexedField indexedField;
+    @XmlElementWrapper(name = "customAnnotations")
+    @XmlElement(name = "customAnnotation")
     protected List<CustomAnnotation> customAnnotations = newArrayList();
     @Getter
+    @XmlElement
     protected ManyToOneConfig manyToOneConfig;
     @Getter
+    @XmlElement
     protected OneToManyConfig oneToManyConfig;
     @Getter
+    @XmlElement
     protected OneToOneConfig oneToOneConfig;
     @Getter
+    @XmlElement
     protected OneToOneConfig inverseOneToOneConfig;
     @Getter
+    @XmlElement
     protected ManyToManyConfig manyToManyConfig;
     // db metadata
+    @XmlAttribute
     protected Boolean ignore;
+    @XmlAttribute
     protected JdbcType type; // TODO: confusing ==> rename to jdbcType
+    @XmlAttribute
     protected MappedType mappedType;
+    @XmlAttribute
     protected Boolean lazy;
+    @XmlAttribute
     protected String fieldName;
+    @XmlAttribute
     protected String tableName;
+    @XmlAttribute
     protected String columnName;
+    @XmlAttribute
     protected Integer size;
+    @XmlAttribute
     protected Integer min;
+    @XmlAttribute
     protected Integer max;
+    @XmlAttribute
     protected Integer ordinalPosition;
+    @XmlAttribute
     protected Integer displayOrder;
+    @XmlAttribute
     protected Integer formFieldOrder;
+    @XmlAttribute
     protected Integer searchFieldOrder;
+    @XmlAttribute
     protected Integer searchResultOrder;
+    @XmlAttribute
     protected String typeConverter;
+    @XmlAttribute
     protected String comment;
+    @XmlAttribute
     protected Integer decimalDigits;
+    @XmlAttribute
     protected String defaultValue;
     // functional
+    @XmlAttribute
     protected Boolean businessKey;
+    @XmlAttribute
     protected Boolean asTransient;
+    @XmlAttribute
     protected Boolean messageKey;
+    @XmlAttribute
     protected Boolean html;
+    @XmlAttribute
     private String label;
     // relations
+    @XmlAttribute
     protected Boolean inverse;
+    @XmlAttribute
     protected AssociationDirection associationDirection;
+    @XmlAttribute
     protected Boolean enableOneToVirtualOne;
     // front
+    @XmlAttribute
     protected Boolean autoIncrement;
+    @XmlAttribute
     protected Boolean nullable;
+    @XmlAttribute
     protected Boolean formField;
+    @XmlAttribute
     protected Boolean searchField;
+    @XmlAttribute
     protected Boolean searchResult;
+    @XmlAttribute
     protected Boolean selectLabel;
+    @XmlAttribute
     protected Boolean unique;
+    @XmlAttribute
     protected Boolean version;
+    @XmlAttribute
     protected Boolean visible;
+    @XmlAttribute
     protected Boolean password;
     // relation
+    @XmlAttribute
     protected String targetTableName;
+    @XmlAttribute
     protected String targetColumnName;
 
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     protected List<MetaAttribute> metaAttributes;
 
 

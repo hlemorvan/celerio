@@ -354,7 +354,11 @@ public class MetadataExtractor {
                 table.setCatalog(getString(rsw, "TABLE_CAT"));
                 table.setSchemaName(getString(rsw, "TABLE_SCHEM"));
                 table.setName(getString(rsw, "TABLE_NAME"));
-                table.setType(TableType.valueOf(getString(rsw, "TABLE_TYPE")));
+                String tableTypeStr = getString(rsw, "TABLE_TYPE");
+                if ("BASE TABLE".equalsIgnoreCase(tableTypeStr)) {
+                    tableTypeStr = "TABLE";
+                }
+                table.setType(TableType.valueOf(tableTypeStr));
                 String remarks = getString(rsw, "REMARKS");
                 if (notEmpty(remarks)) {
                     table.setRemarks(remarks);
@@ -378,6 +382,9 @@ public class MetadataExtractor {
         List<String> ret = newArrayList();
         for (TableType tableType : tableTypes) {
             ret.add(tableType.name());
+            if (tableType == TableType.TABLE) {
+                ret.add("BASE TABLE");
+            }
         }
         return ret.toArray(new String[0]);
     }
@@ -399,6 +406,10 @@ public class MetadataExtractor {
 
     private boolean skipTable(Table table) {
         String tableNameUpper = table.getName().toUpperCase();
+
+        if ("INFORMATION_SCHEMA".equalsIgnoreCase(table.getSchemaName())) {
+            return true;
+        }
 
         if ("HIBERNATE_UNIQUE_KEY".equals(tableNameUpper)) {
             log.warn("    Table " + table.getName() + " found but it is a hibernate specific table, skipping");

@@ -21,9 +21,15 @@ import lombok.Data;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CelerioTemplateContext {
+    @XmlElementWrapper(name = "properties")
+    @XmlElement(name = "metaAttribute")
     List<MetaAttribute> properties = newArrayList();
+    @XmlElementWrapper(name = "entityContextProperties")
+    @XmlElement(name = "entityContextProperty")
     List<EntityContextProperty> entityContextProperties = newArrayList();
 }

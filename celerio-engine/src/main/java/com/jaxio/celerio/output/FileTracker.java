@@ -18,6 +18,7 @@ package com.jaxio.celerio.output;
 
 import com.jaxio.celerio.util.IOUtil;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,12 @@ public class FileTracker {
         return generatedFileLocation + File.separatorChar + "generated.xml";
     }
 
+    private XStream newXStream() {
+        XStream xs = new XStream();
+        xs.addPermission(AnyTypePermission.ANY);
+        return xs;
+    }
+
     public SCMStatus getSCMStatus(File projectDir) {
         if (GITStatusCrawler.isProjectUnderGit(projectDir)) {
             return GITStatusCrawler.doStatus(projectDir);
@@ -71,7 +78,7 @@ public class FileTracker {
             return newHashMap();
         }
 
-        XStream xstream = new XStream();
+        XStream xstream = newXStream();
         FileInputStream in = new FileInputStream(xmlFileMetaDatas);
         HashMap<String, FileMetaData> fileMetaDatas = (HashMap<String, FileMetaData>) xstream.fromXML(in);
         closeQuietly(in);
@@ -86,7 +93,7 @@ public class FileTracker {
             parent.mkdirs();
         } // else child was for example "."
 
-        XStream xstream = new XStream();
+        XStream xstream = newXStream();
         FileOutputStream out = new FileOutputStream(xmlFileMetaDatas);
         xstream.toXML(fileMetaDatas, out);
         closeQuietly(out);

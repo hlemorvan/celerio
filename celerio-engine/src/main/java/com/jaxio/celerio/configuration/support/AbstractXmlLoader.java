@@ -18,15 +18,15 @@ package com.jaxio.celerio.configuration.support;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 
-public abstract class AbstractJibxLoader<T> {
+public abstract class AbstractXmlLoader<T> {
 
-    public abstract JibxMarshaller getMarshaller();
+    public abstract Jaxb2Marshaller getMarshaller();
 
     public T load(String filename) throws XmlMappingException, IOException {
         return load(new File(filename));

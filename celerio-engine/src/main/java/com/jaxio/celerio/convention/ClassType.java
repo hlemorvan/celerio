@@ -20,9 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.stripToNull;
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.stripToNull;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.springframework.util.StringUtils.hasLength;
 
 public enum ClassType {

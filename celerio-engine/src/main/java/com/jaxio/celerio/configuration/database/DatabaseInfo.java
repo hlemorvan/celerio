@@ -17,28 +17,39 @@
 package com.jaxio.celerio.configuration.database;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Information about the database where celerio extracted the metadata
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DatabaseInfo {
     @Setter
+    @XmlAttribute
     private int databaseMajorVersion;
     @Setter
+    @XmlAttribute
     private int databaseMinorVersion;
     @Setter
+    @XmlAttribute
     private String databaseProductName = "";
     @Setter
+    @XmlAttribute
     private String databaseProductVersion = "";
     @Setter
+    @XmlAttribute
     private int driverMajorVersion;
     @Setter
+    @XmlAttribute
     private int driverMinorVersion;
     @Setter
+    @XmlAttribute
     private String driverName = "";
     @Setter
+    @XmlAttribute
     private String driverVersion = "";
     @Setter
+    @XmlAttribute
     private String extraInfo = "";
 
     public int getDatabaseMajorVersion() {

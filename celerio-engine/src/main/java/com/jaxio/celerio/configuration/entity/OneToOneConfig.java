@@ -22,19 +22,33 @@ import lombok.Setter;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OneToOneConfig implements CascadeGetter, CacheConfigGetter, FetchTypeGetter, AssociationActionGetter, LabelGetter, TargetEntityNameGetter {
+    @XmlAttribute
     private String var;
+    @XmlAttribute
     private Boolean orphanRemoval;
+    @XmlAttribute
     private FetchType fetch;
+    @XmlAttribute
     private String targetEntityName;
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     private List<Label> labels;
+    @XmlElementWrapper(name = "cascades")
+    @XmlElement(name = "cascade")
     private List<Cascade> cascades;
+    @XmlElement
     private CacheConfig cacheConfig;
+    @XmlElement
     private AssociationAction associationAction;
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     private List<MetaAttribute> metaAttributes;
 
     /*

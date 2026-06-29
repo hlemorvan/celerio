@@ -24,11 +24,20 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
 import static com.jaxio.celerio.configuration.Util.nonNull;
+import jakarta.xml.bind.annotation.*;
 
+@XmlRootElement(name = "celerio")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Celerio {
+    @XmlElementWrapper(name = "includes")
+    @XmlElement(name = "include")
     private List<Include> includes = newArrayList();
     private Configuration configuration = new Configuration();
+    @XmlElementWrapper(name = "entityConfigs")
+    @XmlElement(name = "entityConfig")
     private List<EntityConfig> entityConfigs = newArrayList();
+    @XmlElementWrapper(name = "sharedEnumConfigs")
+    @XmlElement(name = "enumConfig")
     private List<EnumConfig> sharedEnumConfigs = newArrayList();
 
     /*

@@ -27,7 +27,7 @@ import com.jaxio.celerio.model.Relation;
 import com.jaxio.celerio.util.Labels;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
 

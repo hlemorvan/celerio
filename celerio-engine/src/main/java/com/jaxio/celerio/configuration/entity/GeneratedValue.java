@@ -18,13 +18,17 @@ package com.jaxio.celerio.configuration.entity;
 
 import lombok.Setter;
 
-import javax.persistence.GenerationType;
+import jakarta.persistence.GenerationType;
 
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GeneratedValue {
+    @XmlAttribute
     protected String generator;
+    @XmlAttribute
     protected GenerationType strategy;
 
     /*

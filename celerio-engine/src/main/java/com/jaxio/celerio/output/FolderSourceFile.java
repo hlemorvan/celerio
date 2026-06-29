@@ -29,7 +29,7 @@ import static com.google.common.collect.Maps.newConcurrentMap;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.io.IOUtils.contentEquals;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 public class FolderSourceFile implements SourceFile {

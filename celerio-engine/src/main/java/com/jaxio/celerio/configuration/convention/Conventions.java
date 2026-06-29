@@ -24,23 +24,41 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.*;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Change the default Celerio conventions to your own needs.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Conventions {
+    @XmlAttribute
     private TrueFalse renamePkToIdentifiableProperty = TrueFalse.TRUE;
+    @XmlAttribute
     private String identifiableProperty = "id";
     private EclipseFormatter eclipseFormatter = new EclipseFormatter();
     @Setter
+    @XmlAttribute
     private CollectionType collectionType = CollectionType.ArrayList;
     private XmlFormatter xmlFormatter = new XmlFormatter();
+    @XmlAttribute
     private TrueFalse entitySubPackagePreprended = TrueFalse.TRUE;
+    @XmlElementWrapper(name = "classTypes")
+    @XmlElement(name = "classType")
     private List<ClassTypeOverride> classTypes = newArrayList();
+    @XmlElementWrapper(name = "generatedPackages")
+    @XmlElement(name = "generatedPackage")
     private List<GeneratedPackageOverride> generatedPackages = newArrayList();
+    @XmlElementWrapper(name = "methodConventions")
+    @XmlElement(name = "methodConvention")
     private List<MethodConventionOverride> methodConventions = newArrayList();
+    @XmlElementWrapper(name = "wellKnownFolders")
+    @XmlElement(name = "wellKnownFolder")
     private List<WellKnownFolderOverride> wellKnownFolders = newArrayList();
+    @XmlElementWrapper(name = "tableRenamers")
+    @XmlElement(name = "renamer")
     private List<Renamer> tableRenamers = newArrayList();
+    @XmlElementWrapper(name = "columnRenamers")
+    @XmlElement(name = "renamer")
     private List<Renamer> columnRenamers = newArrayList();
 
     /*

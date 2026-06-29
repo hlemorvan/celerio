@@ -21,8 +21,8 @@ import com.jaxio.celerio.model.PackageImportAdder;
 import com.jaxio.celerio.util.AttributeBuilder;
 import org.springframework.util.Assert;
 
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -90,7 +90,7 @@ public class JpaConfigHelper {
                     // we could have removed the NONE element, so we check for emptiness.
                     if (!cascades.isEmpty()) {
                         for (CascadeType ct : cascades) {
-                            importAdder.addImport("static javax.persistence.CascadeType." + ct.name());
+                            importAdder.addImport("static jakarta.persistence.CascadeType." + ct.name());
                         }
 
                         AttributeBuilder ab = new AttributeBuilder();
@@ -142,7 +142,7 @@ public class JpaConfigHelper {
     // ------------------------------------------
 
     public static String jpaFetch(PackageImportAdder adder, FetchTypeGetter... fetchTypeGetters) {
-        Assert.notNull(adder);
+        Assert.notNull(adder, "");
 
         if (fetchTypeGetters == null) {
             return "";
@@ -156,7 +156,7 @@ public class JpaConfigHelper {
                 if (fetchTypeGetter.getFetch() != null) {
                     if (fetchTypeGetter.getFetch().isJpaType()) {
                         FetchType fetchType = fetchTypeGetter.getFetch().asJpaType();
-                        adder.addImport("static javax.persistence.FetchType." + fetchType.name());
+                        adder.addImport("static jakarta.persistence.FetchType." + fetchType.name());
                         return "fetch = " + fetchType.name();
                     } else { // NONE
                         return ""; // user explicitly said he does not want any fetch type.
@@ -173,7 +173,7 @@ public class JpaConfigHelper {
     // ------------------------------------------
 
     public static String orderByAnnotation(PackageImportAdder adder, OrderByGetter... orderByGetters) {
-        Assert.notNull(adder);
+        Assert.notNull(adder, "");
 
         if (orderByGetters == null) {
             return null;
@@ -183,7 +183,7 @@ public class JpaConfigHelper {
         for (OrderByGetter getter : orderByGetters) {
             if (getter != null) {
                 if (getter.getOrderBy() != null && !getter.getOrderBy().isEmpty()) {
-                    adder.addImport("javax.persistence.OrderBy");
+                    adder.addImport("jakarta.persistence.OrderBy");
                     AttributeBuilder ab = new AttributeBuilder();
                     ab.addString(getter.getOrderBy());
                     return ab.bindAttributesTo("@OrderBy");

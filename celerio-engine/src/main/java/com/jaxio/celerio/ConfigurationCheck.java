@@ -34,7 +34,7 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.sort;
-import static javax.persistence.InheritanceType.JOINED;
+import static jakarta.persistence.InheritanceType.JOINED;
 
 /**
  * recursively checks for null values

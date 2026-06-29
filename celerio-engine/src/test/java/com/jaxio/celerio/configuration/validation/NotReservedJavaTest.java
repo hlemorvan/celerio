@@ -16,13 +16,13 @@
 
 package com.jaxio.celerio.configuration.validation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NotReservedJavaTest {
 

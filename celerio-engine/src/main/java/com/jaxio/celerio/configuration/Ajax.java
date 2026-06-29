@@ -19,10 +19,14 @@ package com.jaxio.celerio.configuration;
 import lombok.Data;
 
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Ajax {
+    @XmlAttribute
     private Boolean oneToOne = true;
+    @XmlAttribute
     private Boolean manyToOne = true;
 
     public void setOneToOne(Boolean oneToOne) {

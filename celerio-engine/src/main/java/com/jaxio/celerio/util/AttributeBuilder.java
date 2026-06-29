@@ -16,7 +16,7 @@
 
 package com.jaxio.celerio.util;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class AttributeBuilder {
     private StringBuilder ret = new StringBuilder();

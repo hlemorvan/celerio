@@ -33,7 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import static javax.persistence.InheritanceType.*;
+import static jakarta.persistence.InheritanceType.*;
 
 @Service
 public class EntityFactory {

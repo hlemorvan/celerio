@@ -28,8 +28,8 @@ public class EnumNamer extends AbstractNamer {
     private String type; // lazy init
 
     public EnumNamer(EnumConfig enumConfig, ClassType classType) {
-        Assert.notNull(enumConfig);
-        Assert.notNull(classType);
+        Assert.notNull(enumConfig, "");
+        Assert.notNull(classType, "");
         this.enumConfig = enumConfig;
         this.classType = classType;
     }

@@ -18,17 +18,22 @@ package com.jaxio.celerio.configuration.convention;
 
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class XmlFormatter {
     @Setter
+    @XmlAttribute
     private boolean enableXmlFormatter = false;
 
     @Setter
     @Getter
+    @XmlAttribute
     private Integer maximumLineWidth = 160;
 
     @Setter
     @Getter
+    @XmlAttribute
     private Integer indent = 4;
 
     /*

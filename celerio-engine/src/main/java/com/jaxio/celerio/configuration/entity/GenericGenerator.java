@@ -24,16 +24,22 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
 @Getter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GenericGenerator {
     public static final String HIBERNATE_GENERATOR_UUIDHEX = "uuid";
     public static final String HIBERNATE_GENERATOR_ASSIGNED = "assigned";
     public static final String HIBERNATE_GENERATOR_NATIVE = "native";
 
+    @XmlElementWrapper(name = "parameters")
+    @XmlElement(name = "parameter")
     protected List<MetaAttribute> parameters = newArrayList();
+    @XmlAttribute
     protected String name;
+    @XmlAttribute
     protected String strategy;
 
     public void setParameters(List<MetaAttribute> parameters) {

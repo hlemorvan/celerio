@@ -16,12 +16,13 @@
 
 package com.jaxio.celerio.template.pack;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocalResourcePackFileTest {
 
@@ -57,9 +58,11 @@ public class LocalResourcePackFileTest {
         assertThat(pack.getTemplateByName("subfolder/three.txt").getTemplate()).isEqualTo("three-expected");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void templateNotInFileList() throws IOException {
-        TemplatePack pack = new LocalResourcePackFile(new TemplatePackInfo("dummy"), new File("src/test/resources/templates/3-files-subfolder"));
-        pack.getTemplateByName("unkown.txt");
+    @Test
+    public void templateNotInFileList() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            TemplatePack pack = new LocalResourcePackFile(new TemplatePackInfo("dummy"), new File("src/test/resources/templates/3-files-subfolder"));
+            pack.getTemplateByName("unkown.txt");
+        });
     }
 }

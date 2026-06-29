@@ -20,7 +20,7 @@ import com.jaxio.celerio.convention.GeneratedPackage;
 import com.jaxio.celerio.util.Named;
 import lombok.Getter;
 
-import static org.apache.commons.lang.StringUtils.removeStart;
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 public class PackageImport implements Named, Comparable<PackageImport> {
 

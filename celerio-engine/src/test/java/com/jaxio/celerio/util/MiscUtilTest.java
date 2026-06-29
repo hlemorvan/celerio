@@ -16,10 +16,10 @@
 
 package com.jaxio.celerio.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.jaxio.celerio.util.MiscUtil.*;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MiscUtilTest {
 

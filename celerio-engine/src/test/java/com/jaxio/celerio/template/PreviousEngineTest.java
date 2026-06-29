@@ -16,10 +16,10 @@
 
 package com.jaxio.celerio.template;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PreviousEngineTest {
 

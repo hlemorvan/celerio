@@ -17,7 +17,7 @@
 package com.jaxio.celerio.configuration.database;
 
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,16 +28,26 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.configuration.database.Table.keyForMap;
+import jakarta.xml.bind.annotation.*;
 
+@XmlRootElement(name = "metadata")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Metadata {
     @Setter
+    @XmlElement
     private JdbcConnectivity jdbcConnectivity = new JdbcConnectivity();
     @Setter
+    @XmlElement
     private DatabaseInfo databaseInfo = new DatabaseInfo();
+    @XmlElementWrapper(name = "tables")
+    @XmlElement(name = "table")
     private List<Table> tables = newArrayList();
     // Ignored by JIBX thanks to src/main/config/customization.xml
+    @XmlTransient
     private Set<String> tablesInMultipleSchema = new HashSet<String>();
+    @XmlTransient
     private Map<String, Table> tablesByName = newHashMap();
+    @XmlTransient
     private Map<String, Table> tablesBySchemaAndName = newHashMap();
 
     public void setTables(List<Table> tables) {

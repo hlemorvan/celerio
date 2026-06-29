@@ -19,17 +19,17 @@ package com.jaxio.celerio.configuration.support;
 import com.jaxio.celerio.configuration.database.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MetadataLoader extends AbstractJibxLoader<Metadata> {
+public class MetadataLoader extends AbstractXmlLoader<Metadata> {
 
     @Autowired
     @Qualifier("dbMetadataMarshaller")
-    private JibxMarshaller marshaller;
+    private Jaxb2Marshaller marshaller;
 
-    public JibxMarshaller getMarshaller() {
+    public Jaxb2Marshaller getMarshaller() {
         return marshaller;
     }
 }

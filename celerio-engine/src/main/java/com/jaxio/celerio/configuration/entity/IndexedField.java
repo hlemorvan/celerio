@@ -23,19 +23,29 @@ import repackaged.org.hibernate.search.annotations.Store;
 import repackaged.org.hibernate.search.annotations.TermVector;
 
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Allows you to configure Hibernate Search Field annotation.
  */
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class IndexedField {
+    @XmlAttribute
     public String name;
+    @XmlAttribute
     public Store store;
+    @XmlAttribute
     public Boolean index;
+    @XmlAttribute
     public Analyze analyze;
+    @XmlAttribute
     public String analyzer;
+    @XmlAttribute
     public Norms norms;
+    @XmlAttribute
     public TermVector termVector;
+    @XmlAttribute
     public String bridgeImpl;
 
     /*

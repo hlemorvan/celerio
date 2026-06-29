@@ -31,18 +31,38 @@ import static com.jaxio.celerio.configuration.Pattern.hasPattern;
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.configuration.entity.AssociationDirection.UNIDIRECTIONAL;
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Configuration {
     protected CelerioTemplateContext celerioTemplateContext = new CelerioTemplateContext();
+    @XmlElementWrapper(name = "packs")
+    @XmlElement(name = "pack")
     protected List<Pack> packs = newArrayList();
+    @XmlElementWrapper(name = "modules")
+    @XmlElement(name = "module")
     protected List<Module> modules = newArrayList();
+    @XmlElementWrapper(name = "customModules")
+    @XmlElement(name = "customModule")
     protected List<String> customModules = newArrayList();
+    @XmlElementWrapper(name = "filenames")
+    @XmlElement(name = "pattern")
     protected List<Pattern> filenames = newArrayList();
+    @XmlElementWrapper(name = "templates")
+    @XmlElement(name = "pattern")
     protected List<Pattern> templates = newArrayList();
+    @XmlElementWrapper(name = "tables")
+    @XmlElement(name = "pattern")
     protected List<Pattern> tables = newArrayList();
+    @XmlElementWrapper(name = "sequences")
+    @XmlElement(name = "sequencePattern")
     protected List<SequencePattern> sequences = newArrayList();
+    @XmlElementWrapper(name = "numberMappings")
+    @XmlElement(name = "numberMapping")
     protected List<NumberMapping> numberMappings = newArrayList();
+    @XmlElementWrapper(name = "dateMappings")
+    @XmlElement(name = "dateMapping")
     protected List<DateMapping> dateMappings = newArrayList();
     protected CacheConfig defaultEntityCacheConfig;
     protected ManyToOneConfig defaultManyToOneConfig;
@@ -54,19 +74,27 @@ public class Configuration {
     protected Conventions conventions = new Conventions();
     protected Generation generation = new Generation();
     protected Restriction restriction = new Restriction();
+    @XmlAttribute
     protected AssociationDirection associationDirection = UNIDIRECTIONAL;
+    @XmlAttribute
     private Boolean enableOneToVirtualOne = false;
 
     @Getter
     @Setter
+    @XmlAttribute
     private TrueFalse jpaUseCatalog = TrueFalse.FALSE;
     @Getter
     @Setter
+    @XmlAttribute
     private TrueFalse jpaUseSchema = TrueFalse.FALSE;
 
+    @XmlAttribute
     protected String applicationName = "application";
     @Setter
+    @XmlAttribute
     protected String rootPackage;
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     protected List<MetaAttribute> metaAttributes = newArrayList();
     protected HeaderComment headerComment = new HeaderComment();
 

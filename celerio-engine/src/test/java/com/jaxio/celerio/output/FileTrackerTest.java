@@ -17,11 +17,11 @@
 package com.jaxio.celerio.output;
 
 import com.jaxio.celerio.util.IOUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,10 +30,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration("classpath*:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class FileTrackerTest {
 
     @Autowired
@@ -87,13 +87,13 @@ public class FileTrackerTest {
         // make sure we can detect the file change
         HashMap<String, FileMetaData> loadedGeneratedFiles = fileTracker.loadFromProjectDir(projectDir);
         assertThat(loadedGeneratedFiles.values()).contains(new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f1.txt", f1));
-        assertThat(loadedGeneratedFiles.values()).excludes(new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f2.txt", f2));
+        assertThat(loadedGeneratedFiles.values()).doesNotContain(new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f2.txt", f2));
 
         FileMetaData willBeDeleted = new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f1.txt", f1);
         HashSet<FileMetaData> deletedFiles = fileTracker.deleteGeneratedFileIfIdentical(projectDir, new ArrayList<String>());
         assertThat(deletedFiles).hasSize(1);
         assertThat(deletedFiles).contains(willBeDeleted);
-        assertThat(deletedFiles).excludes(new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f2.txt", f2));
+        assertThat(deletedFiles).doesNotContain(new FileMetaData(null, null, "leaveGeneratedFilesUntouched-f2.txt", f2));
     }
 
     private File createFileWithContent(File projectDir, String filePath, String content) throws IOException {

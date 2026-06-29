@@ -63,7 +63,7 @@ public class JpaIntermediateOneToManyRelation implements RelationSpi, PackageImp
     }
 
     private String getOneToManyAnnotation() {
-        addImport("javax.persistence.OneToMany");
+        addImport("jakarta.persistence.OneToMany");
         AttributeBuilder ab = new AttributeBuilder();
 
         ab.add("mappedBy = \"" + relation.getFrom().getVar() + "\"");

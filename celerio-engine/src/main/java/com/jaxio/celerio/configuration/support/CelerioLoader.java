@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -32,19 +32,18 @@ import java.io.IOException;
 
 @Service
 @Slf4j
-public class CelerioLoader extends AbstractJibxLoader<Celerio> {
+public class CelerioLoader extends AbstractXmlLoader<Celerio> {
 
     @Autowired
     @Qualifier("celerioMarshaller")
-    private JibxMarshaller marshaller;
+    private Jaxb2Marshaller marshaller;
 
-    public JibxMarshaller getMarshaller() {
+    public Jaxb2Marshaller getMarshaller() {
         return marshaller;
     }
 
     public Celerio load(String filename) throws XmlMappingException, IOException {
         return load(new File(filename));
-
     }
 
     public Celerio load(File file) throws XmlMappingException, IOException {

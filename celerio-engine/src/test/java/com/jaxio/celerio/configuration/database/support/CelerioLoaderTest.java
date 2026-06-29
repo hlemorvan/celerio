@@ -20,28 +20,28 @@ import com.jaxio.celerio.configuration.database.IndexHolder;
 import com.jaxio.celerio.configuration.database.Metadata;
 import com.jaxio.celerio.configuration.database.Table;
 import com.jaxio.celerio.configuration.support.MetadataLoader;
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
+@Disabled
 @ContextConfiguration("classpath:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CelerioLoaderTest {
 
     @Autowired
     private MetadataLoader loader;
 
     // TODO replace ADES test
-    @Ignore
+    @Disabled
     public void loader() throws XmlMappingException, IOException {
         Metadata metadata = loader.load("src/test/resources/metadata-ades.xml");
         assertThat(metadata).isNotNull();

@@ -24,18 +24,18 @@ import com.jaxio.celerio.configuration.support.MetadataLoader;
 import com.jaxio.celerio.factory.ProjectFactory;
 import com.jaxio.celerio.model.Entity;
 import com.jaxio.celerio.output.OutputResultFactory;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration("classpath:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@ExtendWith(SpringExtension.class)
+@Disabled
 public class NoPkOnlyIndexesTest {
 
     @Autowired

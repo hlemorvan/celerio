@@ -16,9 +16,9 @@
 
 package com.jaxio.celerio.configuration.database.h2;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class H2EnumValuesExtractorTest {
     @Test
@@ -42,5 +42,12 @@ public class H2EnumValuesExtractorTest {
         assertThat(new H2EnumValuesExtractor().extract("(ONE_TWO_OR_THREE IN(1, 2, 3))")) //
                 .hasSize(3) //
                 .containsExactly("1", "2", "3");
+    }
+
+    @Test
+    public void h2v2format() {
+        assertThat(new H2EnumValuesExtractor().extract("\"A_B_OR_C\" IN('a', 'b', 'c')")) //
+                .hasSize(3) //
+                .containsExactly("a", "b", "c");
     }
 }

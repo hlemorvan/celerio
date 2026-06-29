@@ -17,11 +17,11 @@
 package com.jaxio.celerio.convention;
 
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import static com.jaxio.celerio.convention.GeneratedPackage.Model;
 import static org.apache.commons.io.FilenameUtils.normalize;
-import static org.apache.commons.lang.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.replace;
 
 @Getter
 public enum WellKnownFolder {

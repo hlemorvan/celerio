@@ -19,6 +19,7 @@ package com.jaxio.celerio.configuration;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Meta attributes are free form key value pairs
@@ -26,8 +27,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MetaAttribute {
+    @XmlAttribute
     private String name;
+    @XmlAttribute
     private String value;
 
     /*

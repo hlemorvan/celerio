@@ -16,10 +16,10 @@
 
 package com.jaxio.celerio.configuration.validation;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class JavaPackageValidator implements ConstraintValidator<JavaPackage, String> {
     boolean allowEmpty;

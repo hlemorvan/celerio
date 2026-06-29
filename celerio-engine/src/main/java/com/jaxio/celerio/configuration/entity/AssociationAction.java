@@ -17,14 +17,22 @@
 package com.jaxio.celerio.configuration.entity;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AssociationAction {
+    @XmlAttribute
     private Boolean create;
+    @XmlAttribute
     private Boolean edit;
+    @XmlAttribute
     private Boolean view;
+    @XmlAttribute
     private Boolean select;
+    @XmlAttribute
     private Boolean autoComplete;
+    @XmlAttribute
     private Boolean remove;
 
     /*

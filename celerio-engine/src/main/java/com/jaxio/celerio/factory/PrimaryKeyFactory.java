@@ -67,7 +67,7 @@ public class PrimaryKeyFactory {
     }
 
     private PrimaryKey buildSimplePrimaryKey(Entity entity) {
-        Assert.isTrue(entity.isRoot());
+        Assert.isTrue(entity.isRoot(), "");
 
         Table table = entity.getTable();
         Attribute pkAttribute = entity.getAttributeByTableAndColumnName(table.getName(), table.getPrimaryKey());
@@ -85,7 +85,7 @@ public class PrimaryKeyFactory {
     }
 
     private PrimaryKey buildCompositePrimaryKey(Entity entity) {
-        Assert.isTrue(entity.isRoot());
+        Assert.isTrue(entity.isRoot(), "");
 
         Table table = entity.getTable();
         List<String> pkColumns = table.getPrimaryKeys();

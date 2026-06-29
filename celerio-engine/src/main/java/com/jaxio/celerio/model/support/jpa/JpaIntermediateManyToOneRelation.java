@@ -63,7 +63,7 @@ public class JpaIntermediateManyToOneRelation implements RelationSpi, PackageImp
     }
 
     private String getManyToOneAnnotation() {
-        addImport("javax.persistence.ManyToOne");
+        addImport("jakarta.persistence.ManyToOne");
         AttributeBuilder ab = new AttributeBuilder();
         ManyToOneConfig manyToOneDefaultConf = relation.getMiddleEntity().getConfig().getCelerio().getConfiguration().getDefaultManyToOneConfig();
         ab.add(jpaCascade(this, relation.getCascadeGetter(), manyToOneDefaultConf));
@@ -75,7 +75,7 @@ public class JpaIntermediateManyToOneRelation implements RelationSpi, PackageImp
         if (relation.isInverse()) {
             return null;
         }
-        addImport("javax.persistence.JoinTable");
+        addImport("jakarta.persistence.JoinTable");
         String fromJoinColumn = getJoinColumn(relation.getMiddleToLeft());
         String toJoinColumn = getJoinColumn(relation.getMiddleToRight());
         return "@JoinTable(name = \"" + relation.getMiddleEntity().getTableNameEscaped() + "\", joinColumns = " + fromJoinColumn + ", inverseJoinColumns = "
@@ -93,7 +93,7 @@ public class JpaIntermediateManyToOneRelation implements RelationSpi, PackageImp
         } else {
             throw new IllegalStateException("What is this relation ?");
         }
-        addImport("javax.persistence.JoinColumn");
+        addImport("jakarta.persistence.JoinColumn");
         return "@JoinColumn(name = \"" + builder.getAttributes() + "\")";
     }
 

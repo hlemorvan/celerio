@@ -20,7 +20,7 @@ import com.jaxio.celerio.configuration.database.Metadata;
 import com.jaxio.celerio.configuration.database.TableType;
 import com.jaxio.celerio.configuration.database.support.MetadataExtractor;
 import com.jaxio.celerio.configuration.support.MetadataLoader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;

@@ -17,9 +17,12 @@
 package com.jaxio.celerio.configuration.entity;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Cascade {
     @Setter
+    @XmlAttribute
     private CascadeType type;
 
     public Cascade() {

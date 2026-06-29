@@ -19,17 +19,17 @@ package com.jaxio.celerio.configuration.support;
 import com.jaxio.celerio.configuration.pack.CelerioPack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CelerioPackConfigLoader extends AbstractJibxLoader<CelerioPack> {
+public class CelerioPackConfigLoader extends AbstractXmlLoader<CelerioPack> {
 
     @Autowired
     @Qualifier("celerioPackMarshaller")
-    private JibxMarshaller marshaller;
+    private Jaxb2Marshaller marshaller;
 
-    public JibxMarshaller getMarshaller() {
+    public Jaxb2Marshaller getMarshaller() {
         return marshaller;
     }
 }

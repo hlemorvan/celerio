@@ -16,8 +16,8 @@
 
 package com.jaxio.celerio.configuration;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class NumberMappingTest {
 
@@ -31,14 +31,14 @@ public class NumberMappingTest {
         nm.setColumnDecimalDigitsMin(1);
         nm.setColumnDecimalDigitsMax(4);
 
-        Assert.assertTrue(nm.match(1, 1));
-        Assert.assertTrue(nm.match(10, 3));
+        Assertions.assertTrue(nm.match(1, 1));
+        Assertions.assertTrue(nm.match(10, 3));
 
-        Assert.assertFalse(nm.match(1, 4));
-        Assert.assertFalse(nm.match(11, 1));
-        Assert.assertFalse(nm.match(1, null));
-        Assert.assertFalse(nm.match(1, null));
-        Assert.assertFalse(nm.match(null, null));
+        Assertions.assertFalse(nm.match(1, 4));
+        Assertions.assertFalse(nm.match(11, 1));
+        Assertions.assertFalse(nm.match(1, null));
+        Assertions.assertFalse(nm.match(1, null));
+        Assertions.assertFalse(nm.match(null, null));
     }
 
     @Test
@@ -51,15 +51,15 @@ public class NumberMappingTest {
         nm.setColumnDecimalDigitsMin(4);
         nm.setColumnDecimalDigitsMax(null);
 
-        Assert.assertTrue(nm.match(11, 4));
-        Assert.assertTrue(nm.match(22, 22));
+        Assertions.assertTrue(nm.match(11, 4));
+        Assertions.assertTrue(nm.match(22, 22));
 
-        Assert.assertFalse(nm.match(10, 4));
-        Assert.assertFalse(nm.match(11, 3));
+        Assertions.assertFalse(nm.match(10, 4));
+        Assertions.assertFalse(nm.match(11, 3));
 
-        Assert.assertFalse(nm.match(1, null));
-        Assert.assertFalse(nm.match(1, null));
-        Assert.assertFalse(nm.match(null, null));
+        Assertions.assertFalse(nm.match(1, null));
+        Assertions.assertFalse(nm.match(1, null));
+        Assertions.assertFalse(nm.match(null, null));
     }
 
 }

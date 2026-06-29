@@ -19,7 +19,7 @@ package com.jaxio.celerio.configuration.database;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -31,41 +31,59 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.configuration.database.support.SqlUtil.escapeSql;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Describes all the metadata for a given table
  */
 @Slf4j
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Table {
 
     // columns
+    @XmlElementWrapper(name = "columns")
+    @XmlElement(name = "column")
     private List<Column> columns = newArrayList();
+    @XmlTransient
     private Map<String, Column> columnsByName = newHashMap();
 
     // indexes
+    @XmlElementWrapper(name = "indexes")
+    @XmlElement(name = "indexe")
     private List<Index> indexes = newArrayList();
+    @XmlTransient
     private Map<String, IndexHolder> indexHoldersByName = newHashMap();
 
     // imported keys
+    @XmlElementWrapper(name = "importedKeys")
+    @XmlElement(name = "importedKey")
     private List<ImportedKey> importedKeys = newArrayList();
+    @XmlTransient
     private Map<String, ForeignKey> foreignKeysByName = newHashMap();
 
     // primary keys
+    @XmlElementWrapper(name = "primaryKeys")
+    @XmlElement(name = "primaryKey")
     private List<String> primaryKeys = newArrayList();
 
     // misc
     @Setter
+    @XmlAttribute
     protected String name;
     @Setter
+    @XmlAttribute
     protected String remarks;
     @Setter
+    @XmlAttribute
     protected TableType type;
 
     @Getter
     @Setter
+    @XmlAttribute
     protected String schemaName;
     @Getter
     @Setter
+    @XmlAttribute
     protected String catalog;
 
     public Map<String, Column> getColumnsByName() {

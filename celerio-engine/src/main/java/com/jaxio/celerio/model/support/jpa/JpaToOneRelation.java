@@ -77,7 +77,7 @@ public class JpaToOneRelation extends AbstractRelationSpi {
     }
 
     public String getManyToOneAnnotation() {
-        addImport("javax.persistence.ManyToOne");
+        addImport("jakarta.persistence.ManyToOne");
         return new AttributeBuilder( //
                 getManyToOneCascade(), //
                 getManyToOneFetch()) //
@@ -85,8 +85,8 @@ public class JpaToOneRelation extends AbstractRelationSpi {
     }
 
     public String getOneToOneAnnotation() {
-        addImport("javax.persistence.OneToOne");
-        addImport("static javax.persistence.FetchType.LAZY");
+        addImport("jakarta.persistence.OneToOne");
+        addImport("static jakarta.persistence.FetchType.LAZY");
         AttributeBuilder ab = new AttributeBuilder();
 
         if (relation.isInverse()) {
@@ -112,7 +112,7 @@ public class JpaToOneRelation extends AbstractRelationSpi {
             if (relation.getFromAttribute().isInCpk()) {
                 ab.addString("value", relation.getFromAttribute().getVar());
             }
-            addImport("javax.persistence.MapsId");
+            addImport("jakarta.persistence.MapsId");
             return ab.bindAttributesTo("@MapsId");
         }
         return "";
@@ -126,13 +126,13 @@ public class JpaToOneRelation extends AbstractRelationSpi {
 //            return ""; // not needed.
 //        }
         AttributeBuilder ab = getJoinColumnAttributes(fromAttribute, toAttribute);
-        addImport("javax.persistence.JoinColumn");
+        addImport("jakarta.persistence.JoinColumn");
         return ab.bindAttributesTo("@JoinColumn");
     }
 
     private String getJoinColumnsAnnotation(List<AttributePair> attributePairs) {
-        addImport("javax.persistence.JoinColumns");
-        addImport("javax.persistence.JoinColumn");
+        addImport("jakarta.persistence.JoinColumns");
+        addImport("jakarta.persistence.JoinColumn");
 
         List<String> ab = newArrayList();
         for (AttributePair pair : attributePairs) {
@@ -228,23 +228,23 @@ public class JpaToOneRelation extends AbstractRelationSpi {
     // ----------------------------------------
 
     private String getManyToOneCascade() {
-        Assert.isTrue(relation.isManyToOne());
+        Assert.isTrue(relation.isManyToOne(), "");
         return jpaCascade(this, //
                 relation.getFromAttribute().getColumnConfig().getManyToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultManyToOneConfig());
     }
 
     private String getOneToOneCascade() {
-        Assert.isTrue(relation.isOneToOne());
-        Assert.isTrue(!relation.isInverse());
+        Assert.isTrue(relation.isOneToOne(), "");
+        Assert.isTrue(!relation.isInverse(), "");
         return jpaCascade(this, //
                 relation.getFromAttribute().getColumnConfig().getOneToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultOneToOneConfig());
     }
 
     private String getInverseOneToOneCascade() {
-        Assert.isTrue(relation.isOneToOne());
-        Assert.isTrue(relation.isInverse());
+        Assert.isTrue(relation.isOneToOne(), "");
+        Assert.isTrue(relation.isInverse(), "");
         return jpaCascade(this, //
                 relation.getInverse().getFromAttribute().getColumnConfig().getInverseOneToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultInverseOneToOneConfig());
@@ -255,22 +255,22 @@ public class JpaToOneRelation extends AbstractRelationSpi {
     // ----------------------------------------
 
     private String getManyToOneFetch() {
-        Assert.isTrue(relation.isManyToOne());
+        Assert.isTrue(relation.isManyToOne(), "");
         return jpaFetch(this, relation.getFromAttribute().getColumnConfig().getManyToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultManyToOneConfig());
     }
 
     private String getOneToOneFetch() {
-        Assert.isTrue(relation.isOneToOne());
-        Assert.isTrue(!relation.isInverse());
+        Assert.isTrue(relation.isOneToOne(), "");
+        Assert.isTrue(!relation.isInverse(), "");
         return jpaFetch(this, //
                 relation.getFromAttribute().getColumnConfig().getOneToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultOneToOneConfig());
     }
 
     private String getInverseOneToOneFetch() {
-        Assert.isTrue(relation.isOneToOne());
-        Assert.isTrue(relation.isInverse());
+        Assert.isTrue(relation.isOneToOne(), "");
+        Assert.isTrue(relation.isInverse(), "");
         return jpaFetch(this, //
                 relation.getFromAttribute().getColumnConfig().getInverseOneToOneConfig(), //
                 relation.getFromEntity().getConfig().getCelerio().getConfiguration().getDefaultInverseOneToOneConfig());

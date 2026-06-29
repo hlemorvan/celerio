@@ -18,25 +18,33 @@ package com.jaxio.celerio.configuration.database;
 
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Description of the primary key columns that are referenced by a table's foreign key columns (the primary keys imported by a table).
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ImportedKey {
     @Setter
+    @XmlAttribute
     protected String fkColumnName;
     @Setter
+    @XmlAttribute
     protected String fkName;
 
     @Setter
+    @XmlAttribute
     protected String pkColumnName;
     @Setter
+    @XmlAttribute
     protected String pkTableName;
     @Setter
     @Getter
+    @XmlAttribute
     protected String pkTableSchema;
     @Setter
     @Getter
+    @XmlAttribute
     protected String pkTableCatalog;
 
 

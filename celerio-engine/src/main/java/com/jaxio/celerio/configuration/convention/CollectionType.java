@@ -20,8 +20,8 @@ import lombok.Getter;
 
 @Getter
 public enum CollectionType {
-    ArrayList("java.util.List", "java.util.ArrayList", "javax.persistence.metamodel.ListAttribute"), //
-    HashSet("java.util.Set", "java.util.HashSet", "javax.persistence.metamodel.SetAttribute");
+    ArrayList("java.util.List", "java.util.ArrayList", "jakarta.persistence.metamodel.ListAttribute"), //
+    HashSet("java.util.Set", "java.util.HashSet", "jakarta.persistence.metamodel.SetAttribute");
     private final String fullType;
     private final String implementationFullType;
     private final String metaModelFullType;

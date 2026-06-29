@@ -18,16 +18,21 @@ package com.jaxio.celerio.configuration.convention;
 
 import com.jaxio.celerio.convention.GeneratedPackage;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Override the convention for a given GeneratedPackage
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GeneratedPackageOverride {
     @Setter
+    @XmlAttribute
     private GeneratedPackage generatedPackage;
     @Setter
+    @XmlAttribute
     private String rootPackage;
     @Setter
+    @XmlAttribute
     private String subPackage;
 
     /*

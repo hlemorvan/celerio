@@ -19,14 +19,19 @@ package com.jaxio.celerio.configuration.entity;
 import lombok.Setter;
 
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Configuration element for Hibernate/EhCache 2d level cache.
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CacheConfig {
+    @XmlAttribute
     private CacheConcurrencyStrategy usage;
+    @XmlAttribute
     private String include;
+    @XmlAttribute
     private String region;
 
     /*

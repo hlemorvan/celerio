@@ -22,19 +22,35 @@ import lombok.Setter;
 import java.util.List;
 
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OneToManyConfig implements CascadeGetter, CacheConfigGetter, FetchTypeGetter, OrderByGetter, AssociationActionGetter, LabelGetter {
+    @XmlAttribute
     private String var;
+    @XmlAttribute
     private String elementVar;
+    @XmlAttribute
     private Boolean orphanRemoval;
+    @XmlAttribute
     private FetchType fetch;
+    @XmlAttribute
     private String orderBy;
+    @XmlAttribute
     private Integer displayOrder;
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     private List<Label> labels;
+    @XmlElementWrapper(name = "cascades")
+    @XmlElement(name = "cascade")
     private List<Cascade> cascades;
+    @XmlElement
     private CacheConfig cacheConfig;
+    @XmlElement
     private AssociationAction associationAction;
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     private List<MetaAttribute> metaAttributes;
 
     /*

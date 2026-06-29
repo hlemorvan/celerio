@@ -25,18 +25,29 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.convention.CommentStyle.JAVA;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Entry point to configure an enum generation.
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EnumConfig {
+    @XmlAttribute
     private String name;
+    @XmlAttribute
     private String rootPackage;
+    @XmlAttribute
     private String subPackage;
+    @XmlAttribute
     private EnumType type;
+    @XmlAttribute
     private String userType;
+    @XmlElementWrapper(name = "enumValues")
+    @XmlElement(name = "enumValue")
     private List<EnumValue> enumValues = newArrayList();
+    @XmlElementWrapper(name = "comments")
+    @XmlElement(name = "comment")
     private List<String> comments = newArrayList();
 
     /*

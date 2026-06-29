@@ -26,26 +26,38 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Pattern.hasPattern;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * A pack is the aggregation of templates and static files that produces functionalities.
  */
 @Setter
 @ToString
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Pack {
+    @XmlAttribute
     private String name;
+    @XmlAttribute
     private String path;
+    @XmlAttribute
     private boolean enable = true;
+    @XmlAttribute
     private Integer order;
+    @XmlElementWrapper(name = "properties")
+    @XmlElement(name = "metaAttribute")
     protected List<MetaAttribute> properties = newArrayList();
+    @XmlElementWrapper(name = "filenames")
+    @XmlElement(name = "pattern")
     protected List<Pattern> filenames = newArrayList();
+    @XmlElementWrapper(name = "templates")
+    @XmlElement(name = "pattern")
     protected List<Pattern> templates = newArrayList();
 
     public Pack() {
     }
 
     public Pack(String name) {
-        Assert.isTrue(!name.endsWith(".pack"));
+        Assert.isTrue(!name.endsWith(".pack"), "");
         this.name = name;
     }
 

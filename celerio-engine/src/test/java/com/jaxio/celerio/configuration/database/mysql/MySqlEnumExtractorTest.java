@@ -16,13 +16,13 @@
 
 package com.jaxio.celerio.configuration.database.mysql;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MySqlEnumExtractorTest {
     private JdbcTemplate jdbcTemplate() {
@@ -30,7 +30,7 @@ public class MySqlEnumExtractorTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void film() {
         SqlRowSet queryForRowSet = jdbcTemplate().queryForRowSet("show columns from film where type like 'enum%'");
         while (queryForRowSet.next()) {

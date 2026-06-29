@@ -17,8 +17,8 @@
 package com.jaxio.celerio.maven.plugin.generate;
 
 import com.jaxio.celerio.maven.plugin.celerio.CelerioConfigurationExtractor;
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CelerioConfigurationExtractorTest {
 
@@ -45,16 +45,16 @@ public class CelerioConfigurationExtractorTest {
                 + "			</conventions>\n" //
                 + "		</configuration>\n" //
                 + "	";
-        Assert.assertEquals(CelerioConfigurationExtractor.CELERIO_XML_START + expected + CelerioConfigurationExtractor.CELERIO_XML_END,
+        Assertions.assertEquals(CelerioConfigurationExtractor.CELERIO_XML_START + expected + CelerioConfigurationExtractor.CELERIO_XML_END,
                 extractor.getCelerioConfig());
-        Assert.assertEquals(true, true);
+        Assertions.assertEquals(true, true);
     }
 
     @Test
     public void noCelerioConfig() {
         String xml = "\n<configuration><jdbcUser>me</jdbcUser></configuration>";
         CelerioConfigurationExtractor extractor = new CelerioConfigurationExtractor(xml);
-        Assert.assertEquals(null, extractor.getCelerioConfig());
+        Assertions.assertEquals(null, extractor.getCelerioConfig());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class CelerioConfigurationExtractorTest {
                 + "				</convention>\n" //
                 + "			</conventions>\n" //
                 + "		</configuration>\n	";
-        Assert.assertEquals(CelerioConfigurationExtractor.CELERIO_XML_START + expected + CelerioConfigurationExtractor.CELERIO_XML_END,
+        Assertions.assertEquals(CelerioConfigurationExtractor.CELERIO_XML_START + expected + CelerioConfigurationExtractor.CELERIO_XML_END,
                 extractor.getCelerioConfig());
     }
 }

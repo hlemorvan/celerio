@@ -17,11 +17,15 @@
 package com.jaxio.celerio.configuration.entity;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Label {
 
+    @XmlAttribute
     private String lang;
+    @XmlAttribute
     private String value;
 
     /*

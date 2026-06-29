@@ -17,11 +17,11 @@
 package com.jaxio.celerio.output;
 
 import com.jaxio.celerio.Config;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class XmlFormatterTest {
 

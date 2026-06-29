@@ -19,16 +19,21 @@ package com.jaxio.celerio.configuration.database;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Description of the given table's indices and statistics
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Index {
     @Setter
+    @XmlAttribute
     protected String columnName;
     @Setter
+    @XmlAttribute
     protected String indexName;
     @Setter
+    @XmlAttribute
     protected boolean nonUnique;
 
     /*

@@ -23,30 +23,45 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static com.jaxio.celerio.configuration.Util.nonNull;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Configuration of a column, the data reflect the jdbc metadata
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Column {
     @Setter
+    @XmlAttribute
     protected String columnDef;
     @Setter
+    @XmlAttribute
     protected int decimalDigits;
     @Setter
+    @XmlAttribute
     protected String name;
     @Setter
+    @XmlAttribute
     protected Boolean autoIncrement;
     @Setter
+    @XmlAttribute
     protected boolean nullable;
     @Setter
+    @XmlAttribute
     protected int ordinalPosition;
     @Setter
+    @XmlAttribute
     protected String remarks;
     @Setter
+    @XmlAttribute
     protected int size;
     @Setter
+    @XmlAttribute
     protected JdbcType type;
+    @XmlElementWrapper(name = "enumValues")
+    @XmlElement(name = "enumValue")
     protected Set<String> enumValues = newHashSet();
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     protected Set<MetaAttribute> metaAttributes = newHashSet();
 
     /*

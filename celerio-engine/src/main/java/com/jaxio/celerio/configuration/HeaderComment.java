@@ -23,10 +23,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static java.util.Calendar.YEAR;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Specify your own file header comments
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class HeaderComment {
     private static final int currentYear = Calendar.getInstance().get(YEAR);
     private static List<String> defaultHeaderComment = newArrayList(
@@ -36,8 +38,12 @@ public class HeaderComment {
             "Need commercial support ? Contact us: info@jaxio.com"
     );
 
+    @XmlAttribute
     protected Boolean include = true;
+    @XmlAttribute
     protected Boolean showTemplateName = true;
+    @XmlElementWrapper(name = "lines")
+    @XmlElement(name = "line")
     protected List<String> lines = newArrayList();
 
     /*

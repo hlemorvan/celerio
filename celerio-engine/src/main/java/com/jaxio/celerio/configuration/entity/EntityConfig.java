@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.InheritanceType;
+import jakarta.persistence.InheritanceType;
 import java.util.List;
 import java.util.Map;
 
@@ -34,41 +34,73 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.jaxio.celerio.configuration.Util.nonNull;
 import static com.jaxio.celerio.configuration.entity.ColumnConfig.*;
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Describes an entity config
  */
 @Setter
 @Slf4j
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EntityConfig implements CacheConfigGetter {
+    @XmlAttribute
     private Boolean skip;
+    @XmlAttribute
     private String entityName;
     @Getter
+    @XmlAttribute
     private String catalog;
     @Getter
+    @XmlAttribute
     private String schemaName;
+    @XmlAttribute
     private String tableName;
+    @XmlAttribute
     private String sequenceName;
+    @XmlAttribute
     private Boolean indexed;
+    @XmlAttribute
     private Boolean middleTable;
+    @XmlAttribute
     private String comment;
+    @XmlAttribute
     private String rootPackage;
+    @XmlAttribute
     private String subPackage;
+    @XmlAttribute
     private String label;
+    @XmlAttribute
     private AssociationDirection associationDirection;
+    @XmlElement
     private CacheConfig cacheConfig;
+    @XmlElementWrapper(name = "usages")
+    @XmlElement(name = "usage")
     private List<String> usages = newArrayList();
+    @XmlElement
     private Inheritance inheritance;
+    @XmlAttribute
     private CollectionType collectionType;
+    @XmlElement
     private ExtendsClass extendsClass;
+    @XmlElementWrapper(name = "implementsInterfaces")
+    @XmlElement(name = "implementsInterface")
     private List<ImplementsInterface> implementsInterfaces = newArrayList();
+    @XmlElementWrapper(name = "customAnnotations")
+    @XmlElement(name = "customAnnotation")
     private List<CustomAnnotation> customAnnotations = newArrayList();
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     private List<Label> labels;
+    @XmlElementWrapper(name = "columnConfigs")
+    @XmlElement(name = "columnConfig")
     private List<ColumnConfig> columnConfigs = newArrayList();
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     private List<MetaAttribute> metaAttributes = newArrayList();
     // Ignored by JIBX thanks to src/main/config/customization.xml
+    @XmlTransient
     private Map<String, ColumnConfig> columnConfigByColumnName = newHashMap();
 
     /*

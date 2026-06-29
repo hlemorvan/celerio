@@ -20,16 +20,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.InheritanceType;
+import jakarta.persistence.InheritanceType;
 
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 @Getter
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Inheritance {
+    @XmlAttribute
     private String discriminatorColumn;
+    @XmlAttribute
     private String discriminatorValue;
+    @XmlAttribute
     private String parentEntityName;
+    @XmlAttribute
     private InheritanceType strategy;
 
     public boolean hasDiscriminatorColumn() {

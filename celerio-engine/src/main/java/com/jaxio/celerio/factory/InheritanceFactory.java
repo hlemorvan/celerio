@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.persistence.InheritanceType;
+import jakarta.persistence.InheritanceType;
 
 @Log
 @Service

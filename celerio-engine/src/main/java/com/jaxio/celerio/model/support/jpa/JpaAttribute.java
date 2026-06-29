@@ -32,7 +32,7 @@ import java.util.List;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class JpaAttribute extends AbstractAttributeSpi {
 
@@ -74,13 +74,13 @@ public class JpaAttribute extends AbstractAttributeSpi {
                 || attribute.getColumnConfig().getAsTransient() == FALSE) {
             return null;
         }
-        addImport("javax.persistence.Transient");
+        addImport("jakarta.persistence.Transient");
         return "@Transient";
     }
 
     public String getIdAnnotation() {
         if (attribute.isSimplePk()) {
-            addImport("javax.persistence.Id");
+            addImport("jakarta.persistence.Id");
             return "@Id";
         } else {
             return null;
@@ -109,7 +109,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
                 annotation.append("@Type(type = " + enumConfig.getUserType() + ", parameters = { @Parameter(name = \"class\", value = \""
                         + attribute.getEntity().getModel().getFullType() + "\"), @Parameter(name = \"attribute\", value = \"" + attribute.getVar() + "\") })");
             } else {
-                addImport("javax.persistence.Convert");
+                addImport("jakarta.persistence.Convert");
                 addImport("" + attribute.getFullType() + "Converter");
                 annotation.append("@Convert(converter=" + attribute.getType() + "Converter.class" + ")");
             }
@@ -151,7 +151,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
         if (builder.isEmpty()) {
             return null;
         }
-        addImport("javax.persistence.Basic");
+        addImport("jakarta.persistence.Basic");
         return "@Basic(" + builder.getAttributes() + ")";
     }
 
@@ -162,12 +162,12 @@ public class JpaAttribute extends AbstractAttributeSpi {
         if (attribute.getColumnConfig().getEnumConfig().isCustomType()) {
             return null;
         }
-        addImport("javax.persistence.Enumerated");
+        addImport("jakarta.persistence.Enumerated");
         if (attribute.getColumnConfig().getEnumConfig().isString()) {
-            addImport("static javax.persistence.EnumType.STRING");
+            addImport("static jakarta.persistence.EnumType.STRING");
             return "@Enumerated(STRING)";
         } else {
-            addImport("static javax.persistence.EnumType.ORDINAL");
+            addImport("static jakarta.persistence.EnumType.ORDINAL");
             return "@Enumerated(ORDINAL)";
         }
     }
@@ -183,7 +183,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
         if (!attribute.isLazyLoaded()) {
             return null;
         }
-        addImport("static javax.persistence.FetchType.LAZY");
+        addImport("static jakarta.persistence.FetchType.LAZY");
         return "fetch = LAZY";
     }
 
@@ -191,26 +191,26 @@ public class JpaAttribute extends AbstractAttributeSpi {
         if (!attribute.isLob()) {
             return null;
         }
-        addImport("javax.persistence.Lob");
+        addImport("jakarta.persistence.Lob");
         return "@Lob";
     }
 
     public String getTemporalAnnotation() {
         if (attribute.isJavaUtilOnlyDate() /* TODO: handle mapping to Calendar */) {
-            addImport("javax.persistence.Temporal");
-            addImport("static javax.persistence.TemporalType.DATE");
+            addImport("jakarta.persistence.Temporal");
+            addImport("static jakarta.persistence.TemporalType.DATE");
             return "@Temporal(DATE)";
         }
 
         if (attribute.isJavaUtilDateAndTime()) {
-            addImport("javax.persistence.Temporal");
-            addImport("static javax.persistence.TemporalType.TIMESTAMP");
+            addImport("jakarta.persistence.Temporal");
+            addImport("static jakarta.persistence.TemporalType.TIMESTAMP");
             return "@Temporal(TIMESTAMP)";
         }
 
         if (attribute.isJavaUtilOnlyTime()) {
-            addImport("javax.persistence.Temporal");
-            addImport("static javax.persistence.TemporalType.TIME");
+            addImport("jakarta.persistence.Temporal");
+            addImport("static jakarta.persistence.TemporalType.TIME");
             return "@Temporal(TIME)";
         }
 
@@ -222,7 +222,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
         if (attributes.isEmpty()) {
             return "";
         } else {
-            addImport("javax.persistence.Column");
+            addImport("jakarta.persistence.Column");
             return "@Column(" + attributes.getAttributes() + ")";
         }
     }
@@ -309,7 +309,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
         }
 
         if (attribute.getMappedType().isEligibleForVersion()) {
-            addImport("javax.persistence.Version");
+            addImport("jakarta.persistence.Version");
             return "@Version";
         } else {
             throw new IllegalStateException("The column " + attribute.getFullColumnName() + " type cannot be used with @Version");
@@ -352,8 +352,8 @@ public class JpaAttribute extends AbstractAttributeSpi {
         } else if (attribute.getAutoIncrement() == TRUE && !attribute.isSimpleFk()) {
             // the jdbc driver supports IS_AUTOINCREMENT metadata, great!
             // if it is an fk, we do not want @GeneratedValue because we use instead @MapsId on the association...
-            addImport("javax.persistence.GeneratedValue");
-            addImport("static javax.persistence.GenerationType.IDENTITY");
+            addImport("jakarta.persistence.GeneratedValue");
+            addImport("static jakarta.persistence.GenerationType.IDENTITY");
             return "@GeneratedValue(strategy = IDENTITY)";
         } else if (attribute.getAutoIncrement() == FALSE && /* 32 length string are special for us */!attribute.isString()) {
             // the jdbc driver supports IS_AUTOINCREMENT metadata, great!
@@ -366,8 +366,8 @@ public class JpaAttribute extends AbstractAttributeSpi {
     }
 
     private String getGeneratedValueForSequenceNameByConfiguration() {
-        addImport("javax.persistence.GeneratedValue");
-        addImport("static javax.persistence.GenerationType.SEQUENCE");
+        addImport("jakarta.persistence.GeneratedValue");
+        addImport("static jakarta.persistence.GenerationType.SEQUENCE");
         return "@GeneratedValue(strategy = SEQUENCE, " //
                 + "generator = \"" + attribute.getEntity().getEntityConfig().getSequenceName() + "\")";
     }
@@ -375,12 +375,12 @@ public class JpaAttribute extends AbstractAttributeSpi {
     private String getGeneratedValueAnnotationByConfiguration() {
         if (attribute.getColumnConfig().hasGeneratedValue()) {
             GeneratedValue gv = attribute.getColumnConfig().getGeneratedValue();
-            addImport("javax.persistence.GeneratedValue");
+            addImport("jakarta.persistence.GeneratedValue");
             if (gv.hasStrategy() && gv.hasGenerator()) {
-                addImport("static javax.persistence.GenerationType." + gv.getStrategy());
+                addImport("static jakarta.persistence.GenerationType." + gv.getStrategy());
                 return "@GeneratedValue(strategy = " + gv.getStrategy() + ", generator = \"" + gv.getGenerator() + "\")";
             } else if (gv.hasStrategy()) {
-                addImport("static javax.persistence.GenerationType." + gv.getStrategy());
+                addImport("static jakarta.persistence.GenerationType." + gv.getStrategy());
                 return "@GeneratedValue(strategy = " + gv.getStrategy() + ")";
             } else {
                 return "@GeneratedValue(generator = \"" + gv.getGenerator() + "\")";
@@ -393,7 +393,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
     private String getGeneratedValueAnnotationByConvention() {
         if (hasIdGeneratorByConvention()) {
             String strategy = getGenericGeneratorStrategy();
-            addImport("javax.persistence.GeneratedValue");
+            addImport("jakarta.persistence.GeneratedValue");
             if (isBlank(strategy)) {
                 return "@GeneratedValue";
             } else {
@@ -462,7 +462,7 @@ public class JpaAttribute extends AbstractAttributeSpi {
     }
 
     private String getSequenceGeneratorAnnotationByConfiguration() {
-        addImport("javax.persistence.SequenceGenerator");
+        addImport("jakarta.persistence.SequenceGenerator");
 
         // The sequence name is known, we are looking for extra info such as initialValue and allocationSize.
         // It may seems clumsy but our promise is to keep it simple for the user, we do not want to introduce

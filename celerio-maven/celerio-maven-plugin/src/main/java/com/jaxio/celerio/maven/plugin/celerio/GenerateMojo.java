@@ -18,6 +18,7 @@ package com.jaxio.celerio.maven.plugin.celerio;
 
 import com.jaxio.celerio.Config;
 import com.jaxio.celerio.configuration.*;
+import com.jaxio.celerio.configuration.Module;
 import com.jaxio.celerio.configuration.database.JdbcConnectivity;
 import com.jaxio.celerio.configuration.database.Metadata;
 import com.jaxio.celerio.configuration.database.TableType;
@@ -28,7 +29,7 @@ import com.jaxio.celerio.main.CelerioProducer;
 import com.jaxio.celerio.output.OutputResult;
 import com.jaxio.celerio.output.OutputResultFactory;
 import com.jaxio.celerio.template.pack.PackLoader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -50,7 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * The core Celerio Engine is invoked by this plugin. This plugin can either connect directly to a database and extract the metadata information or use the

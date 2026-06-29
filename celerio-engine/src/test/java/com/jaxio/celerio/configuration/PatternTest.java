@@ -16,8 +16,8 @@
 
 package com.jaxio.celerio.configuration;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PatternTest {
 
@@ -25,16 +25,16 @@ public class PatternTest {
     public void goodUsage() {
         Pattern p = new Pattern("**/support/*", true);
 
-        Assert.assertTrue(p.match("support/toto"));
-        Assert.assertTrue(p.match("src/main/resource/support/toto"));
-        // Assert.assertTrue(p.match("src\\main\\resource\\support\\toto"));
+        Assertions.assertTrue(p.match("support/toto"));
+        Assertions.assertTrue(p.match("src/main/resource/support/toto"));
+        // Assertions.assertTrue(p.match("src\\main\\resource\\support\\toto"));
     }
 
     @Test
     public void badUsage() {
         Pattern p = new Pattern("**/support/*", true);
-        Assert.assertFalse(p.match("support"));
-        Assert.assertFalse(p.match("ddd"));
+        Assertions.assertFalse(p.match("support"));
+        Assertions.assertFalse(p.match("ddd"));
     }
 
 }

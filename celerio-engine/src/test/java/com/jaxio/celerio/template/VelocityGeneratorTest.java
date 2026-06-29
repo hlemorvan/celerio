@@ -19,12 +19,11 @@ package com.jaxio.celerio.template;
 import com.jaxio.celerio.Config;
 import com.jaxio.celerio.main.CelerioProducer;
 import com.jaxio.celerio.output.OutputResultFactory;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileReader;
 import java.io.StringReader;
@@ -32,11 +31,11 @@ import java.util.Scanner;
 import java.util.regex.MatchResult;
 
 import static org.apache.commons.io.IOUtils.contentEquals;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration("classpath:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class VelocityGeneratorTest {
     @Autowired
     private Config config;

@@ -18,16 +18,21 @@ package com.jaxio.celerio.configuration.convention;
 
 import com.jaxio.celerio.convention.WellKnownFolder;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * change the convention for a given well known folder
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class WellKnownFolderOverride {
     @Setter
+    @XmlAttribute
     private WellKnownFolder wellKnownFolder;
     @Setter
+    @XmlAttribute
     private String folder;
     @Setter
+    @XmlAttribute
     private String generatedFolder;
 
     /*

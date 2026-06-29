@@ -18,8 +18,8 @@ package com.jaxio.celerio.convention;
 
 import lombok.Getter;
 
-import static org.apache.commons.lang.StringUtils.*;
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 public enum MethodConvention {
     GET("get"), //

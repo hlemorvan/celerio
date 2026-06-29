@@ -17,6 +17,7 @@
 package com.jaxio.celerio.configuration;
 
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Used to introduce a new 'namer' property on each Celerio's entity context instance.
@@ -26,11 +27,17 @@ import lombok.Setter;
  * "prefixEntityNameSuffix". Similarly ${entity.property.getter} returns "getPrefixEntityNameSuffix".
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EntityContextProperty {
+    @XmlAttribute
     private String property;
+    @XmlAttribute
     private String rootPackage;
+    @XmlAttribute
     private String subPackage;
+    @XmlAttribute
     private String prefix;
+    @XmlAttribute
     private String suffix;
 
     /**

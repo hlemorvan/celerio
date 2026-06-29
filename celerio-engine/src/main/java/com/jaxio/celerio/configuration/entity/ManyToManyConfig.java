@@ -21,25 +21,41 @@ import lombok.Setter;
 
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.StringUtils.hasLength;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * The ManyToManyConfig allows you to fine tune your @ManyToMany association. The ManyToManyConfig element must be a child of a columnConfig element referencing
  * (i.e foreignkey) the entity that is the target of this @ManyToMany association. The columnConfig necessarily belongs to a 'join entity'.
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ManyToManyConfig implements CascadeGetter, CacheConfigGetter, FetchTypeGetter, OrderByGetter, AssociationActionGetter, LabelGetter {
+    @XmlAttribute
     private String var;
+    @XmlAttribute
     private String elementVar;
+    @XmlAttribute
     private FetchType fetch;
+    @XmlAttribute
     private String orderBy;
+    @XmlAttribute
     private Integer displayOrder;
+    @XmlAttribute
     private String targetEntityName;
+    @XmlElementWrapper(name = "labels")
+    @XmlElement(name = "label")
     private List<Label> labels;
+    @XmlElementWrapper(name = "cascades")
+    @XmlElement(name = "cascade")
     private List<Cascade> cascades;
+    @XmlElement
     private CacheConfig cacheConfig;
+    @XmlElement
     private AssociationAction associationAction;
+    @XmlElementWrapper(name = "metaAttributes")
+    @XmlElement(name = "metaAttribute")
     private List<MetaAttribute> metaAttributes;
 
     /*

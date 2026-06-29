@@ -20,7 +20,7 @@ import com.jaxio.celerio.configuration.entity.IndexedField;
 import com.jaxio.celerio.spi.support.AbstractAttributeSpi;
 import com.jaxio.celerio.util.AnnotationBuilder;
 import com.jaxio.celerio.util.AttributeBuilder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import repackaged.org.hibernate.search.annotations.Analyze;
 import repackaged.org.hibernate.search.annotations.Norms;
 import repackaged.org.hibernate.search.annotations.Store;

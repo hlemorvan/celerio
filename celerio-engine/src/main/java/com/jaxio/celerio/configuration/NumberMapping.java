@@ -18,16 +18,23 @@ package com.jaxio.celerio.configuration;
 
 import com.jaxio.celerio.util.MappedType;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * Global rule to map columns whose JDBC TYPE correspond to a number to a Java type.
  */
 @Setter
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NumberMapping {
+    @XmlAttribute
     private MappedType mappedType;
+    @XmlAttribute
     private Integer columnSizeMin;
+    @XmlAttribute
     private Integer columnSizeMax;
+    @XmlAttribute
     private Integer columnDecimalDigitsMin;
+    @XmlAttribute
     private Integer columnDecimalDigitsMax;
 
     /*

@@ -21,14 +21,18 @@ import org.springframework.util.AntPathMatcher;
 
 import java.io.File;
 import java.util.List;
+import jakarta.xml.bind.annotation.*;
 
 /*
  * A pattern is a structure to help handling inclusion and exclusion of resources
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Pattern {
     @Setter
+    @XmlAttribute
     private String pattern;
     @Setter
+    @XmlAttribute
     private boolean include;
     private transient AntPathMatcher antPathMatcher = new AntPathMatcher();
 

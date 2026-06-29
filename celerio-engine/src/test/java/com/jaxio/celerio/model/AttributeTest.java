@@ -18,9 +18,9 @@ package com.jaxio.celerio.model;
 
 import com.jaxio.celerio.configuration.database.JdbcType;
 import com.jaxio.celerio.configuration.entity.ColumnConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AttributeTest {
 

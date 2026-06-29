@@ -18,16 +18,21 @@ package com.jaxio.celerio.configuration.convention;
 
 import com.jaxio.celerio.convention.MethodConvention;
 import lombok.Setter;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * change the prefix/suffix conventions for a given method
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MethodConventionOverride {
     @Setter
+    @XmlAttribute
     private MethodConvention methodConvention;
     @Setter
+    @XmlAttribute
     private String prefix;
     @Setter
+    @XmlAttribute
     private String suffix;
 
     /*

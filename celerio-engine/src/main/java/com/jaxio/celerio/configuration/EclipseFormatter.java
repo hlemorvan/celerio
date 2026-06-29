@@ -19,10 +19,14 @@ package com.jaxio.celerio.configuration;
 import lombok.Data;
 
 import static com.jaxio.celerio.configuration.Util.firstNonNull;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EclipseFormatter {
+    @XmlAttribute
     private FormatterEnum formatterChoice = FormatterEnum.USE_ECLIPSE_DEFAULT;
+    @XmlAttribute
     private String formatterFile;
 
     public void setFormatterChoice(FormatterEnum formatterChoice) {

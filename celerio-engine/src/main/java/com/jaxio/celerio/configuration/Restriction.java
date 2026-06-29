@@ -20,18 +20,26 @@ import com.jaxio.celerio.convention.ClassType;
 import com.jaxio.celerio.convention.GeneratedPackage;
 import com.jaxio.celerio.convention.WellKnownFolder;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Restriction {
     @NotNull
+    @XmlElementWrapper(name = "classTypes")
+    @XmlElement(name = "classType")
     private List<ClassType> classTypes = newArrayList();
     @NotNull
+    @XmlElementWrapper(name = "wellKnownFolders")
+    @XmlElement(name = "wellKnownFolder")
     private List<WellKnownFolder> wellKnownFolders = newArrayList();
     @NotNull
+    @XmlElementWrapper(name = "generatedPackages")
+    @XmlElement(name = "generatedPackage")
     private List<GeneratedPackage> generatedPackages = newArrayList();
 
     /*

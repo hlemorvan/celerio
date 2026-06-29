@@ -21,30 +21,27 @@ import com.jaxio.celerio.configuration.convention.XmlFormatter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 
-/**
- * Pretty-prints xml, supplied as a string.
- * <p>
- * eg. <code>
- * String formattedXml = new XmlFormatter().format("&lt;tag&gt;&lt;nested&gt;hello&lt;/nested&gt;&lt;/tag&gt;");
- * </code> http://stackoverflow.com/questions/139076/how-to-pretty-print-xml-from-java
- */
-@SuppressWarnings("deprecation")
 @Service
 @Slf4j
 public class XmlCodeFormatter {
@@ -64,21 +61,34 @@ public class XmlCodeFormatter {
         if (!xmlFormatterConfig.isEnableXmlFormatter()) {
             return unformattedXml;
         }
-
         try {
             final Document document = parseXmlFile(unformattedXml);
-            OutputFormat format = new OutputFormat(document);
-            format.setLineWidth(xmlFormatterConfig.getMaximumLineWidth());
-            format.setIndenting(true);
-            format.setIndent(xmlFormatterConfig.getIndent());
-            format.setLineSeparator(System.getProperty("line.separator"));
-            Writer out = new StringWriter();
-            XMLSerializer serializer = new XMLSerializer(out, format);
-            serializer.serialize(document);
-            return out.toString();
-        } catch (Exception e) {
+            removeWhitespaceNodes(document.getDocumentElement());
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+                    String.valueOf(xmlFormatterConfig.getIndent()));
+            StringWriter out = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(out));
+            String sep = System.getProperty("line.separator");
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + sep + out.toString();
+        } catch (TransformerException e) {
             log.warn("Could not format the content: " + unformattedXml);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void removeWhitespaceNodes(Node node) {
+        NodeList children = node.getChildNodes();
+        for (int i = children.getLength() - 1; i >= 0; i--) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().trim().isEmpty()) {
+                node.removeChild(child);
+            } else {
+                removeWhitespaceNodes(child);
+            }
         }
     }
 
@@ -87,25 +97,11 @@ public class XmlCodeFormatter {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
             dbf.setExpandEntityReferences(false);
-
-            // prevent dtd download...
-            // http://stackoverflow.com/questions/155101/make-documentbuilder-parse-ignore-dtd-references
             dbf.setFeature("http://xml.org/sax/features/namespaces", false);
             dbf.setFeature("http://xml.org/sax/features/validation", false);
             dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
             DocumentBuilder db = dbf.newDocumentBuilder();
-
-            // // prevent dtd download...
-            // db.setEntityResolver(new EntityResolver() {
-            // @Override
-            // public InputSource resolveEntity(String publicId, String systemId)
-            // throws SAXException, IOException {
-            // return new InputSource(new StringReader(""));
-            // }
-            // });
-            //
             InputSource is = new InputSource(new StringReader(in));
             return db.parse(is);
         } catch (ParserConfigurationException e) {

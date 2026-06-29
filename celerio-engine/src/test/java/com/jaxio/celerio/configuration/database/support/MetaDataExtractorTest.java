@@ -20,25 +20,25 @@ import com.jaxio.celerio.configuration.database.Column;
 import com.jaxio.celerio.configuration.database.Metadata;
 import com.jaxio.celerio.configuration.database.Table;
 import com.jaxio.celerio.configuration.support.MetadataLoader;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration("classpath:applicationContext-celerio.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MetaDataExtractorTest {
 
     private static String MINIMAL_SCRIPT = "classpath:/minimal.sql";
@@ -52,8 +52,7 @@ public class MetaDataExtractorTest {
 
     @Test
     public void noTable() throws ClassNotFoundException, SQLException, JAXBException, IOException {
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        EmbeddedDatabase embeddedDatabase = builder.setType(EmbeddedDatabaseType.H2).build();
+        EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(EmbeddedDatabaseType.H2).build();
 
         Metadata meta = extractor.extract(embeddedDatabase.getConnection());
 
@@ -161,7 +160,6 @@ public class MetaDataExtractorTest {
     }
 
     private EmbeddedDatabase createMinimalEmbeddedDatabase(String sqlScript) {
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        return builder.setType(EmbeddedDatabaseType.H2).addScript(sqlScript).build();
+        return new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(EmbeddedDatabaseType.H2).addScript(sqlScript).build();
     }
 }

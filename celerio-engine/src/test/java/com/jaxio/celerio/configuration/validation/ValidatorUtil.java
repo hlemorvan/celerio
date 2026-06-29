@@ -17,13 +17,15 @@
 package com.jaxio.celerio.configuration.validation;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
-import javax.validation.*;
+import jakarta.validation.*;
 import java.lang.annotation.ElementType;
 
 public class ValidatorUtil {
     public static Validator getValidator() {
         Configuration<?> configuration = Validation.byProvider(HibernateValidator.class).configure();
+        configuration.messageInterpolator(new ParameterMessageInterpolator());
         configuration.traversableResolver(new DummyTraversableResolver());
         return configuration.buildValidatorFactory().getValidator();
     }

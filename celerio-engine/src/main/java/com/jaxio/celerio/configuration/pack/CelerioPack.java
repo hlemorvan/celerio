@@ -18,14 +18,24 @@ package com.jaxio.celerio.configuration.pack;
 
 import com.jaxio.celerio.configuration.CelerioTemplateContext;
 import lombok.Data;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlRootElement(name = "celerioPack")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CelerioPack {
+    @XmlElement
     private Value packName;
+    @XmlElement
     private Value packDescription;
+    @XmlElement
     private Value packDescription2;
+    @XmlElement
     private Value packCommand;
+    @XmlElement
     private Value packCommandHelp;
+    @XmlElement
     private Value projectLink;
+    @XmlElement
     private CelerioTemplateContext celerioTemplateContext;
 }

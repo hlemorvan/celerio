@@ -17,11 +17,16 @@
 package com.jaxio.celerio.configuration;
 
 import lombok.Data;
+import jakarta.xml.bind.annotation.*;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Generation {
+    @XmlAttribute
     private String modelBasePrefix = "Base";
+    @XmlAttribute
     private boolean useMavenCelerioPlugin = true;
+    @XmlAttribute
     private String version;
 
     public String getModelBasePrefix() {

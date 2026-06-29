@@ -16,11 +16,11 @@
 
 package com.jaxio.celerio.util;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import javax.lang.model.SourceVersion;
 
-import static org.apache.commons.lang.StringUtils.stripToNull;
+import static org.apache.commons.lang3.StringUtils.stripToNull;
 
 public class PackageUtil {
 

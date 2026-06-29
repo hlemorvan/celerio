@@ -21,10 +21,19 @@ import com.jaxio.celerio.configuration.database.support.EnumExtractor;
 import java.util.List;
 
 public class H2EnumValuesExtractor {
-    private static final String H2_ENUM_VALUES = "^\\(\\p{Graph}*\\p{Blank}*IN\\((.*)\\)\\)$";
-    private EnumExtractor enumExtractor = new EnumExtractor(H2_ENUM_VALUES);
+    // H2 1.x: (COLUMN_NAME IN('v1','v2'))
+    private static final String H2_1X = "^\\(\\p{Graph}*\\p{Blank}*IN\\((.*)\\)\\)$";
+    // H2 2.x: "COLUMN_NAME" IN('v1','v2')
+    private static final String H2_2X = "^\"[^\"]+\"\\s*IN\\((.*)\\)$";
+
+    private final EnumExtractor extractor1x = new EnumExtractor(H2_1X);
+    private final EnumExtractor extractor2x = new EnumExtractor(H2_2X);
 
     public List<String> extract(String content) {
-        return enumExtractor.extract(content);
+        List<String> result = extractor2x.extract(content);
+        if (!result.isEmpty()) {
+            return result;
+        }
+        return extractor1x.extract(content);
     }
 }

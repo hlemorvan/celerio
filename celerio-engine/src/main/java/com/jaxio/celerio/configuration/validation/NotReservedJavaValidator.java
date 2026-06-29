@@ -17,10 +17,10 @@
 package com.jaxio.celerio.configuration.validation;
 
 import com.jaxio.celerio.util.JavaKeywords;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class NotReservedJavaValidator implements ConstraintValidator<NotReservedJava, String> {
     boolean allowEmpty;

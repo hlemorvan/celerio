@@ -20,6 +20,8 @@ import com.jaxio.celerio.configuration.database.Column;
 import com.jaxio.celerio.configuration.database.Metadata;
 import com.jaxio.celerio.configuration.database.Table;
 import com.jaxio.celerio.configuration.database.support.Extension;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -32,6 +34,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Service
+@Slf4j
 public class H2Extension implements Extension {
 
     private static final String H2_DEFAULT_SCHEMA_NAME = "PUBLIC";
@@ -79,19 +82,36 @@ public class H2Extension implements Extension {
         JdbcTemplate jdbcTemplate = getJdbcTemplate(connection);
         String schemaName = getSchemaName(metadata);
 
-        List<Constraint> constraints = jdbcTemplate.query(
-                "SELECT table_name, column_name, check_constraint FROM information_schema.columns WHERE table_schema = ? AND LENGTH(check_constraint) > 0",
-                new Object[]{schemaName}, new RowMapper<Constraint>() {
-                    @Override
-                    public Constraint mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Constraint constraint = new Constraint();
-                        constraint.setTableName(rs.getString("table_name"));
-                        constraint.setColumnName(rs.getString("column_name"));
-                        constraint.setConstraint(rs.getString("check_constraint"));
-                        return constraint;
-                    }
-
-                });
+        List<Constraint> constraints;
+        try {
+            constraints = jdbcTemplate.query(
+                    "SELECT tc.table_name, ccu.column_name, cc.check_clause AS check_constraint " +
+                    "FROM information_schema.check_constraints cc " +
+                    "JOIN information_schema.table_constraints tc " +
+                    "    ON cc.constraint_catalog = tc.constraint_catalog " +
+                    "    AND cc.constraint_schema = tc.constraint_schema " +
+                    "    AND cc.constraint_name = tc.constraint_name " +
+                    "JOIN information_schema.constraint_column_usage ccu " +
+                    "    ON cc.constraint_catalog = ccu.constraint_catalog " +
+                    "    AND cc.constraint_schema = ccu.constraint_schema " +
+                    "    AND cc.constraint_name = ccu.constraint_name " +
+                    "WHERE tc.table_schema = ? " +
+                    "    AND tc.constraint_type = 'CHECK' " +
+                    "    AND LENGTH(cc.check_clause) > 0",
+                    new Object[]{schemaName}, new RowMapper<Constraint>() {
+                        @Override
+                        public Constraint mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Constraint constraint = new Constraint();
+                            constraint.setTableName(rs.getString("table_name"));
+                            constraint.setColumnName(rs.getString("column_name"));
+                            constraint.setConstraint(rs.getString("check_constraint"));
+                            return constraint;
+                        }
+                    });
+        } catch (DataAccessException e) {
+            log.warn("Could not query H2 check constraints: {}", e.getMessage());
+            return;
+        }
         for (Constraint constraint : constraints) {
             addEnumValue(metadata, constraint.getTableName(), constraint.getColumnName(), constraint.getConstraint());
         }

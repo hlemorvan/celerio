@@ -18,10 +18,13 @@ package com.jaxio.celerio.configuration.entity;
 
 import lombok.Setter;
 import org.springframework.util.StringUtils;
+import jakarta.xml.bind.annotation.*;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CustomAnnotation {
 
     @Setter
+    @XmlAttribute
     private String annotation;
 
     /*

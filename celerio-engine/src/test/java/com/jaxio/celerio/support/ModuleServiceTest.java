@@ -16,23 +16,24 @@
 
 package com.jaxio.celerio.support;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ModuleServiceTest {
 
     private ModuleService moduleService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         moduleService = new ModuleService();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullParameterShouldThrowException() {
-        moduleService.isModuleEnabled(null);
+        assertThrows(IllegalArgumentException.class, () -> moduleService.isModuleEnabled(null));
     }
 
     @Test

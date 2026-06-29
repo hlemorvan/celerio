@@ -80,7 +80,7 @@ public class RelationFactory {
         for (Attribute a : entity.getCurrentAttributes()) {
             if (a.isInFk()) {
                 String fkTableName = a.getColumnConfig().getTableName();
-                Assert.notNull(fkTableName);
+                Assert.notNull(fkTableName, "");
                 Table t = topLevelCfg.getMetadata().getTableByName(fkTableName);
                 if (!involvedTables.contains(t)) {
                     involvedTables.add(t);
@@ -380,7 +380,7 @@ public class RelationFactory {
 
     private SimpleRelation buildSimpleRelation(Entity entity, ImportedKey importedKey, ForeignKey fk) {
         final Attribute fromAttribute = entity.getAttributeByTableAndColumnName(fk.getFkTableName(), importedKey.getFkColumnName());
-        Assert.isTrue(fromAttribute.getEntity().equals(entity));
+        Assert.isTrue(fromAttribute.getEntity().equals(entity), "");
         Entity targetEntity = getTargetEntity(importedKey, fromAttribute.getColumnConfig());
         Attribute targetAttribute = getTargetAttribute(importedKey, targetEntity);
 
@@ -490,7 +490,7 @@ public class RelationFactory {
         final List<Attribute> fromAttributes = new ArrayList<Attribute>();
         for (ImportedKey importedKey : fk.getImportedKeys()) {
             Attribute fromAttribute = entity.getAttributeByTableAndColumnName(fk.getFkTableName(), importedKey.getFkColumnName());
-            Assert.isTrue(fromAttribute.getEntity().equals(entity));
+            Assert.isTrue(fromAttribute.getEntity().equals(entity), "");
             fromAttributes.add(fromAttribute);
         }
 

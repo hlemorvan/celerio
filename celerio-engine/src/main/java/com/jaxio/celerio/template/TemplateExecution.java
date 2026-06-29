@@ -34,7 +34,7 @@ import com.jaxio.celerio.template.pack.TemplatePack;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -47,7 +47,7 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.convention.WellKnownFolder.*;
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 

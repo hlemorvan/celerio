@@ -24,15 +24,22 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.jaxio.celerio.configuration.Util.nonNull;
+import jakarta.xml.bind.annotation.*;
 
 @NoArgsConstructor
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ForeignKey {
+    @XmlElementWrapper(name = "importedKeys")
+    @XmlElement(name = "importedKey")
     private List<ImportedKey> importedKeys = newArrayList();
     @Setter
+    @XmlAttribute
     private String name;
     @Setter
+    @XmlAttribute
     private String pkTableName;
     @Setter
+    @XmlAttribute
     private String fkTableName;
 
     public ForeignKey(String name, String pkTableName, String fkTableName) {

@@ -59,7 +59,7 @@ public class JpaOneToManyRelation extends AbstractRelationSpi {
     }
 
     public String getOneToManyAnnotation() {
-        addImport("javax.persistence.OneToMany");
+        addImport("jakarta.persistence.OneToMany");
         AttributeBuilder ab = new AttributeBuilder();
         ab.add("mappedBy = \"" + relation.getInverse().getTo().getVar() + "\"");
         ab.add(getOrphanRemoval());

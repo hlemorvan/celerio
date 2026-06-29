@@ -17,7 +17,7 @@
 package com.jaxio.celerio.util;
 
 import static com.jaxio.celerio.convention.MethodConvention.*;
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 /**
  * Identifiable.java is a central interface in the generated code. Its property can be configured through configuration. Velocity templates must use the
