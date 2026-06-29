@@ -48,3 +48,5 @@ include::13-troubleshooting.adoc[]
 include::14-miscellaneous.adoc[]
 
 include::15-migration-guide.adoc[]
+
+include::16-inheritance.adoc[]

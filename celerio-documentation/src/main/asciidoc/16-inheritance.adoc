@@ -1,0 +1,447 @@
+[[inheritance]]
+= 16. Héritage JPA
+
+* <<inheritance-principe>>
+* <<inheritance-workflow>>
+* <<inheritance-single-table>>
+** <<inheritance-single-table-db>>
+** <<inheritance-single-table-config>>
+** <<inheritance-single-table-java>>
+** <<inheritance-single-table-multiniveau>>
+* <<inheritance-joined>>
+** <<inheritance-joined-db>>
+** <<inheritance-joined-config>>
+** <<inheritance-joined-java>>
+* <<inheritance-table-per-class>>
+** <<inheritance-table-per-class-db>>
+** <<inheritance-table-per-class-config>>
+** <<inheritance-table-per-class-java>>
+* <<inheritance-recap>>
+* <<inheritance-limites>>
+
+[[inheritance-principe]]
+== Principe
+
+JPA définit quatre stratégies pour mapper une hiérarchie de classes sur une base relationnelle :
+
+[cols="1,3,2"]
+|===
+|Stratégie|Principe|Support Celerio
+
+|`SINGLE_TABLE`
+|Toutes les classes de la hiérarchie dans **une seule table**, avec une colonne discriminante.
+|✅ Complet
+
+|`JOINED`
+|Chaque classe a **sa propre table**, reliées par leur clé primaire.
+|✅ Complet
+
+|`TABLE_PER_CLASS`
+|Chaque classe **concrète** a sa propre table avec toutes ses colonnes (pas de jointure).
+|✅ Supporté
+
+|`MAPPED_SUPERCLASS`
+|Superclasse non-entité qui fournit des mappings aux sous-classes (`@MappedSuperclass`).
+|❌ Non supporté
+|===
+
+[[inheritance-workflow]]
+== Workflow général
+
+La base de données ne contient aucune information sur la stratégie d'héritage choisie — c'est une décision de conception. Celerio ne peut donc pas l'inférer automatiquement depuis le schéma.
+
+Le workflow est en deux temps :
+
+[source,bash]
+----
+# Étape 1 — extraction automatique du schéma DB
+mvn -Pmetadata generate-sources
+# → génère src/main/config/metadata.xml (ne pas modifier)
+
+# Étape 2 — configurer l'héritage manuellement dans le fichier de config
+# → éditer src/main/config/celerio-maven-plugin/celerio-maven-plugin.xml
+
+# Étape 3 — générer le code
+mvn -Pgen generate-sources
+----
+
+`metadata.xml` décrit les tables et colonnes telles qu'elles existent en DB. +
+`celerio-maven-plugin.xml` indique à Celerio *comment interpréter* ce schéma, notamment la stratégie d'héritage.
+
+Les deux attributs clés de l'élément `<inheritance>` :
+
+[cols="1,1,3"]
+|===
+|Attribut|Où|Rôle
+
+|`strategy`
+|Entité **racine** uniquement
+|`SINGLE_TABLE`, `JOINED` ou `TABLE_PER_CLASS`
+
+|`discriminatorColumn`
+|Entité **racine** (SINGLE_TABLE)
+|Nom de la colonne qui discrimine le type
+
+|`discriminatorValue`
+|Entité **racine et enfants** (SINGLE_TABLE)
+|Valeur dans la colonne discriminante pour cette entité
+
+|`parentEntityName`
+|Entités **enfants**
+|Nom de l'entité parente dans la hiérarchie
+|===
+
+[[inheritance-single-table]]
+== Stratégie SINGLE_TABLE
+
+[[inheritance-single-table-db]]
+=== Schéma DB
+
+Une seule table contient toutes les colonnes de toutes les classes. Une colonne discriminante (`type` dans cet exemple) indique à quelle classe appartient chaque ligne. Les colonnes spécifiques à une sous-classe sont `NULL` pour les autres sous-classes.
+
+[source,sql]
+----
+CREATE TABLE VEHICLE (
+    id            INTEGER     NOT NULL PRIMARY KEY,
+    type          VARCHAR(10) NOT NULL,  -- colonne discriminante
+    name          VARCHAR(100),
+    -- colonnes spécifiques aux véhicules aériens
+    max_altitude  INTEGER,
+    -- colonnes spécifiques aux véhicules terrestres
+    axle_count    INTEGER,
+    road_tax_code VARCHAR(20)
+);
+----
+
+[[inheritance-single-table-config]]
+=== Configuration celerio-maven-plugin.xml
+
+L'entité racine déclare `strategy="SINGLE_TABLE"` et la colonne discriminante. Chaque entité enfant déclare son `parentEntityName` et sa `discriminatorValue`. Les colonnes spécifiques à chaque sous-classe doivent être listées explicitement dans un `<columnConfigs>`.
+
+[source,xml]
+----
+<entityConfigs>
+
+  <!-- Entité racine -->
+  <entityConfig tableName="VEHICLE">
+    <inheritance strategy="SINGLE_TABLE"
+                 discriminatorColumn="type"
+                 discriminatorValue="VEH"/>
+    <columnConfigs>
+      <columnConfig columnName="id"/>
+      <columnConfig columnName="name"/>
+    </columnConfigs>
+  </entityConfig>
+
+  <!-- Sous-classe : véhicule aérien -->
+  <entityConfig entityName="AirVehicle">
+    <inheritance parentEntityName="Vehicle"
+                 discriminatorValue="AIR"/>
+    <columnConfigs>
+      <columnConfig tableName="VEHICLE" columnName="max_altitude"/>
+    </columnConfigs>
+  </entityConfig>
+
+  <!-- Sous-classe : véhicule terrestre -->
+  <entityConfig entityName="RoadVehicle">
+    <inheritance parentEntityName="Vehicle"
+                 discriminatorValue="ROAD"/>
+    <columnConfigs>
+      <columnConfig tableName="VEHICLE" columnName="axle_count"/>
+      <columnConfig tableName="VEHICLE" columnName="road_tax_code"/>
+    </columnConfigs>
+  </entityConfig>
+
+</entityConfigs>
+----
+
+NOTE: En `SINGLE_TABLE`, seule la table racine est réelle en DB. Les entités enfants n'ont pas de table propre, donc leurs colonnes doivent être déclarées explicitement dans `<columnConfigs>` — Celerio ne peut pas les inférer automatiquement.
+
+[[inheritance-single-table-java]]
+=== Code Java généré
+
+[source,java]
+----
+@Entity
+@Table(name = "VEHICLE")
+@Inheritance                              // SINGLE_TABLE est la stratégie par défaut JPA
+@DiscriminatorColumn(name = "type")
+@DiscriminatorValue("VEH")
+public class Vehicle {
+    @Id
+    private Integer id;
+    private String name;
+    // ...
+}
+
+@Entity
+@DiscriminatorValue("AIR")
+public class AirVehicle extends Vehicle {
+    private Integer maxAltitude;
+    // ...
+}
+
+@Entity
+@DiscriminatorValue("ROAD")
+public class RoadVehicle extends Vehicle {
+    private Integer axleCount;
+    private String roadTaxCode;
+    // ...
+}
+----
+
+[[inheritance-single-table-multiniveau]]
+=== Hiérarchie multi-niveaux
+
+La hiérarchie peut être aussi profonde que nécessaire : un enfant peut lui-même avoir des enfants. Il suffit de chaîner les `parentEntityName`.
+
+[source,xml]
+----
+<!-- Niveau 1 : racine -->
+<entityConfig tableName="VEHICLE">
+  <inheritance strategy="SINGLE_TABLE"
+               discriminatorColumn="type"
+               discriminatorValue="VEH"/>
+  ...
+</entityConfig>
+
+<!-- Niveau 2 -->
+<entityConfig entityName="RoadVehicle">
+  <inheritance parentEntityName="Vehicle" discriminatorValue="ROAD"/>
+  ...
+</entityConfig>
+
+<!-- Niveau 3 : enfant d'un enfant -->
+<entityConfig entityName="Motorcycle">
+  <inheritance parentEntityName="RoadVehicle" discriminatorValue="MOTO"/>
+  <columnConfigs>
+    <columnConfig tableName="VEHICLE" columnName="engine_cc"/>
+  </columnConfigs>
+</entityConfig>
+----
+
+[[inheritance-joined]]
+== Stratégie JOINED
+
+[[inheritance-joined-db]]
+=== Schéma DB
+
+Chaque classe a sa propre table. La table enfant ne contient que les colonnes supplémentaires et partage la même clé primaire que la table racine (jointure par PK).
+
+[source,sql]
+----
+CREATE TABLE ACCOUNT (
+    id          INTEGER     NOT NULL PRIMARY KEY,
+    account_num VARCHAR(20) NOT NULL,
+    balance     DECIMAL(15,2)
+);
+
+CREATE TABLE ADMIN_ACCOUNT (
+    id          INTEGER NOT NULL PRIMARY KEY REFERENCES ACCOUNT(id),  -- FK = PK
+    department  VARCHAR(50),
+    clearance   INTEGER
+);
+
+CREATE TABLE ENTERPRISE_ACCOUNT (
+    id          INTEGER NOT NULL PRIMARY KEY REFERENCES ADMIN_ACCOUNT(id),
+    siret       VARCHAR(14),
+    company_name VARCHAR(100)
+);
+----
+
+[[inheritance-joined-config]]
+=== Configuration celerio-maven-plugin.xml
+
+Les colonnes de chaque table enfant peuvent être omises de `<columnConfigs>` — Celerio les ajoute automatiquement (contrairement à SINGLE_TABLE). La clé primaire de l'entité enfant est ignorée automatiquement (elle est héritée de la racine).
+
+[source,xml]
+----
+<entityConfigs>
+
+  <!-- Entité racine -->
+  <entityConfig tableName="ACCOUNT">
+    <inheritance strategy="JOINED"/>
+    <columnConfigs>
+      <columnConfig columnName="account_num" fieldName="accountNumber"/>
+    </columnConfigs>
+  </entityConfig>
+
+  <!-- Entité enfant niveau 1 -->
+  <entityConfig tableName="ADMIN_ACCOUNT" entityName="AdminAccount">
+    <inheritance parentEntityName="Account"/>
+    <!-- columnConfigs optionnel : Celerio détecte les colonnes automatiquement -->
+  </entityConfig>
+
+  <!-- Entité enfant niveau 2 -->
+  <entityConfig tableName="ENTERPRISE_ACCOUNT">
+    <inheritance parentEntityName="AdminAccount"/>
+  </entityConfig>
+
+</entityConfigs>
+----
+
+[[inheritance-joined-java]]
+=== Code Java généré
+
+[source,java]
+----
+@Entity
+@Table(name = "ACCOUNT")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Account {
+    @Id
+    private Integer id;
+    private String accountNumber;
+    private BigDecimal balance;
+    // ...
+}
+
+@Entity
+@Table(name = "ADMIN_ACCOUNT")
+public class AdminAccount extends Account {
+    private String department;
+    private Integer clearance;
+    // ...
+}
+
+@Entity
+@Table(name = "ENTERPRISE_ACCOUNT")
+public class EnterpriseAccount extends AdminAccount {
+    private String siret;
+    private String companyName;
+    // ...
+}
+----
+
+NOTE: Si la clé primaire de la table enfant a un nom *différent* de celle de la racine, Celerio génère `@PrimaryKeyJoinColumn(name = "...")` pour le préciser. Les clés primaires **composites ne sont pas supportées** avec JOINED (assertion explicite dans le moteur).
+
+[[inheritance-table-per-class]]
+== Stratégie TABLE_PER_CLASS
+
+[[inheritance-table-per-class-db]]
+=== Schéma DB
+
+Chaque classe concrète a sa propre table complète, avec *toutes* ses colonnes (colonnes héritées comprises). Il n'y a pas de table pour la classe abstraite racine si elle est abstraite, ou la table racine ne contient que ses propres lignes.
+
+[source,sql]
+----
+CREATE TABLE VEHICLE (
+    id    INTEGER     NOT NULL PRIMARY KEY,
+    name  VARCHAR(100)
+);
+
+CREATE TABLE AIRPLANE (
+    id           INTEGER     NOT NULL PRIMARY KEY,
+    name         VARCHAR(100),  -- répété depuis VEHICLE
+    max_altitude INTEGER
+);
+
+CREATE TABLE CAR (
+    id         INTEGER     NOT NULL PRIMARY KEY,
+    name       VARCHAR(100),  -- répété depuis VEHICLE
+    axle_count INTEGER
+);
+----
+
+[[inheritance-table-per-class-config]]
+=== Configuration celerio-maven-plugin.xml
+
+[source,xml]
+----
+<entityConfigs>
+
+  <!-- Entité racine -->
+  <entityConfig tableName="VEHICLE">
+    <inheritance strategy="TABLE_PER_CLASS"/>
+  </entityConfig>
+
+  <!-- Entités enfants : chacune pointe sur sa propre table -->
+  <entityConfig tableName="AIRPLANE">
+    <inheritance parentEntityName="Vehicle"/>
+  </entityConfig>
+
+  <entityConfig tableName="CAR">
+    <inheritance parentEntityName="Vehicle"/>
+  </entityConfig>
+
+</entityConfigs>
+----
+
+[[inheritance-table-per-class-java]]
+=== Code Java généré
+
+[source,java]
+----
+@Entity
+@Table(name = "VEHICLE")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public class Vehicle {
+    @Id
+    private Integer id;
+    private String name;
+    // ...
+}
+
+@Entity
+@Table(name = "AIRPLANE")
+public class Airplane extends Vehicle {
+    private Integer maxAltitude;
+    // ...
+}
+
+@Entity
+@Table(name = "CAR")
+public class Car extends Vehicle {
+    private Integer axleCount;
+    // ...
+}
+----
+
+CAUTION: `TABLE_PER_CLASS` est la stratégie la moins bien supportée par les implémentations JPA (requêtes polymorphiques coûteuses via `UNION ALL`). Elle est supportée par Celerio mais peu testée — préférez `JOINED` pour les nouvelles conceptions.
+
+[[inheritance-recap]]
+== Récapitulatif des attributs XML
+
+[cols="2,1,1,1,4"]
+|===
+|Attribut|SINGLE_TABLE|JOINED|TABLE_PER_CLASS|Description
+
+|`strategy`
+|Racine
+|Racine
+|Racine
+|Stratégie d'héritage — à déclarer sur l'entité racine uniquement
+
+|`discriminatorColumn`
+|Racine
+|—
+|—
+|Nom de la colonne discriminante dans la table racine
+
+|`discriminatorValue`
+|Racine + enfants
+|—
+|—
+|Valeur de la colonne discriminante pour cette entité
+
+|`parentEntityName`
+|Enfants
+|Enfants
+|Enfants
+|Nom Java de l'entité parente directe dans la hiérarchie
+|===
+
+[[inheritance-limites]]
+== Limites connues
+
+`MAPPED_SUPERCLASS` non supporté::
+Celerio ne génère que des `@Entity`. Si votre modèle utilise `@MappedSuperclass` (classe sans table propre qui fournit des colonnes partagées), il faut l'implémenter manuellement après génération.
+
+Clés primaires composites avec JOINED::
+Les entités enfants en stratégie `JOINED` dont la clé primaire est composite déclenchent une erreur dans le moteur. Seules les PKs simples sont supportées.
+
+Nommage de PK::
+En `JOINED` et `TABLE_PER_CLASS`, le moteur suppose que la colonne PK de la table enfant a le même nom que celle de la table racine. Si ce n'est pas le cas, Celerio génère un `@PrimaryKeyJoinColumn` — les cas très exotiques de nommage peuvent nécessiter un ajustement manuel.
+
+Colonnes SINGLE_TABLE::
+En `SINGLE_TABLE`, les colonnes spécifiques aux sous-classes ne sont pas détectées automatiquement depuis le `metadata.xml`. Elles doivent être listées dans `<columnConfigs>` pour chaque entité enfant, faute de quoi elles sont ignorées.

@@ -517,5 +517,6 @@
         <module>celerio-engine</module>
         <module>celerio-maven</module>
         <module>celerio-spi-example</module>
+        <module>celerio-documentation</module>
     </modules>
 </project>

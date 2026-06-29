@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.jaxio.celerio</groupId>
+    <artifactId>celerio-parent</artifactId>
+    <version>4.0.24-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>celerio-documentation</artifactId>
+  <packaging>pom</packaging>
+  <name>Celerio Documentation</name>
+
+  <properties>
+    <asciidoctor.maven.plugin.version>3.0.0</asciidoctor.maven.plugin.version>
+    <asciidoctorj.version>2.5.13</asciidoctorj.version>
+    <asciidoc.dir>src/main/asciidoc</asciidoc.dir>
+    <output.dir>${project.build.directory}/generated-docs</output.dir>
+  </properties>
+
+  <build>
+    <defaultGoal>process-resources</defaultGoal>
+    <plugins>
+      <!-- Désactivation des plugins Java hérités du parent (aucun code Java ici) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>mojo-descriptor</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+        <version>${asciidoctor.maven.plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctorj</artifactId>
+            <version>${asciidoctorj.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <sourceDirectory>${asciidoc.dir}</sourceDirectory>
+          <attributes>
+            <source-highlighter>coderay</source-highlighter>
+            <sectnums>true</sectnums>
+            <icons>font</icons>
+            <toc>left</toc>
+          </attributes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>output-html</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
+            <configuration>
+              <backend>html5</backend>
+              <sourceDocumentName>master.adoc</sourceDocumentName>
+              <outputDirectory>${output.dir}/html</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-docbook</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
+            <configuration>
+              <backend>docbook5</backend>
+              <sourceDocumentName>master.adoc</sourceDocumentName>
+              <outputDirectory>${project.build.directory}/docbook</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- Activer avec -Pdocx (requiert pandoc installé) -->
+  <profiles>
+    <profile>
+      <id>docx</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>convert-to-docx</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>pandoc</executable>
+                  <workingDirectory>${project.basedir}</workingDirectory>
+                  <arguments>
+                    <argument>--reference-doc=src/main/asciidoc/template_v2.docx</argument>
+                    <argument>${project.build.directory}/docbook/master.xml</argument>
+                    <argument>-f</argument>
+                    <argument>docbook</argument>
+                    <argument>-t</argument>
+                    <argument>docx</argument>
+                    <argument>--toc</argument>
+                    <argument>--toc-depth=3</argument>
+                    <argument>--number-sections</argument>
+                    <argument>--highlight-style=tango</argument>
+                    <argument>--resource-path=src/main/asciidoc</argument>
+                    <argument>-o</argument>
+                    <argument>${output.dir}/word/celerio-reference-guide.docx</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

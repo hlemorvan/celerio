@@ -54,9 +54,9 @@ INSERT INTO "USER" (..., password, ...) VALUES (..., 'admin', ...);
 
 CAUTION: Le préfixe `{noop}` signifie « pas d'encodage ». Ne jamais l'utiliser en production. Utilisez BCrypt (`{bcrypt}`) ou Argon2 (`{argon2}`) à la place.
 
-=== Jakarta EE : `ClassNotFoundException: javax.persistence.*`
+=== Jakarta EE : `ClassNotFoundException: javax.persistence.∗`
 
-Si vous obtenez des `ClassNotFoundException` pour des classes `javax.persistence.*`, `javax.servlet.*` ou `javax.inject.*`, c'est que le code utilise encore les anciens noms de namespace. Depuis Jakarta EE 9+, tous ces packages sont renommés en `jakarta.*`.
+Si vous obtenez des `ClassNotFoundException` pour des classes `javax.persistence.∗`, `javax.servlet.∗` ou `javax.inject.∗`, c'est que le code utilise encore les anciens noms de namespace. Depuis Jakarta EE 9+, tous ces packages sont renommés en `jakarta.∗`.
 
 Solution rapide pour les fichiers générés :
 
@@ -71,7 +71,7 @@ find src -name "*.java" -exec sed -i \
 
 === Hibernate Validator 8 : `NotEmpty` et `Email` non trouvés
 
-Hibernate Validator 8 a supprimé `org.hibernate.validator.constraints.NotEmpty` et `org.hibernate.validator.constraints.Email`. Ces annotations sont maintenant dans `jakarta.validation.constraints.*` :
+Hibernate Validator 8 a supprimé `org.hibernate.validator.constraints.NotEmpty` et `org.hibernate.validator.constraints.Email`. Ces annotations sont maintenant dans `jakarta.validation.constraints.∗` :
 
 [source,java]
 ----

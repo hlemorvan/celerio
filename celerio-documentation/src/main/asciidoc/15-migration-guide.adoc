@@ -155,14 +155,14 @@ Spring 4.x ne supporte pas Java 17+. Spring 6.x exige Java 17 minimum.
 |Ancien import
 |Nouveau import
 
-|`javax.persistence.*`
-|`jakarta.persistence.*`
+|`javax.persistence.∗`
+|`jakarta.persistence.∗`
 
-|`javax.validation.*`
-|`jakarta.validation.*`
+|`javax.validation.∗`
+|`jakarta.validation.∗`
 |===
 
-NOTE: `javax.xml.*`, `javax.sql.*`, `javax.lang.model.*` sont des APIs JDK standard — elles restent `javax.*` même en Java 25.
+NOTE: `javax.xml.∗`, `javax.sql.∗`, `javax.lang.model.∗` sont des APIs JDK standard — elles restent `javax.∗` même en Java 25.
 
 [[velocity-migration]]
 === Velocity 1.6.2 → velocity-engine-core 2.4.1
@@ -232,37 +232,37 @@ Résultat : `Tests run: 94, Failures: 0, Errors: 0, Skipped: 3`
 |`jakarta.inject.Inject`
 
 |`AjaxAuthenticationFailureHandler.java.p.vm`
-|`javax.servlet.http.*`
-|`jakarta.servlet.http.*`
+|`javax.servlet.http.∗`
+|`jakarta.servlet.http.∗`
 
 |`AjaxAuthenticationSuccessHandler.java.p.vm`
-|`javax.servlet.http.*`
-|`jakarta.servlet.http.*`
+|`javax.servlet.http.∗`
+|`jakarta.servlet.http.∗`
 
 |`AlwaysSendUnauthorized401.java.p.vm`
-|`javax.servlet.http.*`
-|`jakarta.servlet.http.*`
+|`javax.servlet.http.∗`
+|`jakarta.servlet.http.∗`
 
 |`SecurityResource.java.p.vm`
-|`javax.servlet.http.*`
-|`jakarta.servlet.http.*`
+|`javax.servlet.http.∗`
+|`jakarta.servlet.http.∗`
 
 |`Entity.java.e.vm`
-|`javax.persistence.*`
-|`jakarta.persistence.*`
+|`javax.persistence.∗`
+|`jakarta.persistence.∗`
 
 |`EntityMeta_.java.e.vm`
-|`javax.persistence.metamodel.*`
-|`jakarta.persistence.metamodel.*`
+|`javax.persistence.metamodel.∗`
+|`jakarta.persistence.metamodel.∗`
 
 |`CompositePk.java.cpk.vm`
-|`javax.persistence.*`
-|`jakarta.persistence.*`
+|`javax.persistence.∗`
+|`jakarta.persistence.∗`
 |===
 
 === ValidationAttribute : jakarta.validation (moteur)
 
-Le moteur Celerio générais des imports `org.hibernate.validator.constraints.*` et `javax.validation.*` dans les entités.
+Le moteur Celerio générais des imports `org.hibernate.validator.constraints.∗` et `javax.validation.∗` dans les entités.
 
 **Fichier corrigé** : `celerio-engine/src/main/java/com/jaxio/celerio/model/support/validation/ValidationAttribute.java`
 
