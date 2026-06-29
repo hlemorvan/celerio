@@ -9,7 +9,7 @@ image:https://travis-ci.org/hlemorvan/celerio.svg[Build Status, link=https://tra
 
 Celerio is a code generator tool for data-driven applications. It can reverse a database schema and generate advanced CRUD-based applications.
 
-* https://www.jaxio.com/documentation/celerio/[Celerio Documentation]
+* https://github.com/hlemorvan/celerio/blob/master/celerio-documentation/src/main/asciidoc/master.adoc[Celerio Documentation]
 
 == How to use it?
 
